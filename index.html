@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏠 RE + AI Incubator Strategy Dashboard</title>
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --accent: #e94560;
+            --accent2: #0f3460;
+            --gold: #f5a623;
+            --green: #27ae60;
+            --blue: #3498db;
+            --light: #f8f9fa;
+            --text: #2c3e50;
+            --card-bg: #ffffff;
+            --gradient1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--light);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            padding: 60px 40px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(233,69,96,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero h1 {
+            font-size: 2.8em;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .hero .subtitle {
+            font-size: 1.3em;
+            opacity: 0.9;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+            position: relative;
+        }
+
+        .hero-stat {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 15px 25px;
+            text-align: center;
+        }
+
+        .hero-stat .number {
+            font-size: 2em;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        .hero-stat .label {
+            font-size: 0.85em;
+            opacity: 0.8;
+        }
+
+        /* Urgency Banner */
+        .urgency-banner {
+            background: linear-gradient(90deg, #e94560, #ff6b6b);
+            color: white;
+            padding: 15px 40px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.1em;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            background: white;
+            padding: 0 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 18px 24px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            white-space: nowrap;
+            color: #666;
+        }
+
+        .nav-tab:hover { color: var(--accent); }
+        .nav-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        /* Content Sections */
+        .content { padding: 40px; max-width: 1400px; margin: 0 auto; }
+
+        .section { display: none; }
+        .section.active { display: block; }
+
+        .section-title {
+            font-size: 2em;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        .section-subtitle {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid #eee;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .card h3 {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .card .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .tag-urgent { background: #ffe0e6; color: #e94560; }
+        .tag-high { background: #fff3e0; color: #f5a623; }
+        .tag-medium { background: #e0f0ff; color: #3498db; }
+        .tag-proptech { background: #e8f5e9; color: #27ae60; }
+        .tag-top { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+
+        .card-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 6px 0;
+            font-size: 0.95em;
+        }
+
+        .card-detail .icon { width: 20px; text-align: center; }
+
+        /* Fit Score */
+        .fit-score {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #eee;
+        }
+
+        .fit-bar {
+            flex: 1;
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .fit-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+
+        .fit-label {
+            font-weight: 700;
+            font-size: 0.9em;
+            min-width: 40px;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--accent), var(--blue), var(--green));
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            background: white;
+            border-radius: 12px;
+            padding: 20px 25px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -33px;
+            top: 24px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px var(--accent);
+        }
+
+        .timeline-date {
+            font-weight: 800;
+            color: var(--accent);
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        .timeline-title {
+            font-weight: 700;
+            font-size: 1.2em;
+            margin: 5px 0;
+        }
+
+        /* Checklist */
+        .checklist {
+            list-style: none;
+        }
+
+        .checklist li {
+            padding: 14px 18px;
+            background: white;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .checklist li:hover { background: #f8f9ff; }
+
+        .checklist li input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+            accent-color: var(--accent);
+        }
+
+        .checklist li.completed {
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+
+        /* Ideas Section */
+        .idea-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+            border-left: 5px solid;
+        }
+
+        .idea-card:nth-child(1) { border-left-color: #e94560; }
+        .idea-card:nth-child(2) { border-left-color: #3498db; }
+        .idea-card:nth-child(3) { border-left-color: #27ae60; }
+        .idea-card:nth-child(4) { border-left-color: #f5a623; }
+        .idea-card:nth-child(5) { border-left-color: #9b59b6; }
+
+        .idea-card h3 {
+            font-size: 1.4em;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        .idea-card .idea-tagline {
+            color: var(--accent);
+            font-weight: 600;
+            font-style: italic;
+            margin-bottom: 12px;
+        }
+
+        .idea-metrics {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .idea-metric {
+            background: #f8f9fa;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85em;
+        }
+
+        .idea-metric strong { color: var(--accent); }
+
+        /* Strategy Boxes */
+        .strategy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .strategy-box {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .strategy-box h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .strategy-box ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .strategy-box li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .strategy-box li::before {
+            content: '→';
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Founder Profile */
+        .profile-section {
+            background: linear-gradient(135deg, #1a1a2e, #0f3460);
+            color: white;
+            border-radius: 16px;
+            padding: 35px;
+            margin-bottom: 30px;
+        }
+
+        .profile-section h3 {
+            color: var(--gold);
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+
+        .strengths-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .strength-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .strength-item .emoji { font-size: 2em; margin-bottom: 8px; }
+        .strength-item .title { font-weight: 700; font-size: 0.95em; }
+        .strength-item .desc { font-size: 0.8em; opacity: 0.8; margin-top: 4px; }
+
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .comparison-table th {
+            background: var(--primary);
+            color: white;
+            padding: 16px;
+            font-weight: 700;
+            text-align: left;
+            font-size: 0.9em;
+        }
+
+        .comparison-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.9em;
+        }
+
+        .comparison-table tr:hover td {
+            background: #f8f9ff;
+        }
+
+        .comparison-table tr:last-child td { border-bottom: none; }
+
+        /* Progress Bar */
+        .progress-container {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+
+        .progress-bar-outer {
+            background: #eee;
+            border-radius: 10px;
+            height: 12px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-bar-inner {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 1s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero { padding: 30px 20px; }
+            .hero h1 { font-size: 1.8em; }
+            .content { padding: 20px; }
+            .nav-tabs { padding: 0 15px; }
+            .nav-tab { padding: 14px 16px; font-size: 0.85em; }
+            .card-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            cursor: help;
+            border-bottom: 1px dotted #999;
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.8em;
+            white-space: nowrap;
+            z-index: 10;
+        }
+
+        /* Print styles */
+        @media print {
+            .nav-tabs { display: none; }
+            .section { display: block !important; page-break-before: always; }
+            .urgency-banner { display: none; }
+        }
+
+        .badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+        .mini-badge {
+            font-size: 0.7em;
+            padding: 3px 8px;
+            border-radius: 12px;
+            background: #f0f0f0;
+            font-weight: 600;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fff9e6, #fff3cc);
+            border: 2px solid var(--gold);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .highlight-box h4 {
+            color: var(--gold);
+            margin-bottom: 8px;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .two-col { grid-template-columns: 1fr; }
+        }
+
+        .countdown {
+            font-size: 2.5em;
+            font-weight: 900;
+            color: var(--accent);
+            text-align: center;
+            padding: 20px;
+        }
+
+        .countdown span {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 10px;
+            margin: 0 3px;
+            min-width: 60px;
+        }
+
+        .countdown .unit {
+            display: block;
+            font-size: 0.3em;
+            opacity: 0.7;
+            font-weight: 400;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+    <h1>🏠 Real Estate × AI — Incubator Strategy</h1>
+    <div class="subtitle">Comprehensive playbook for a technical founder with Amazon/Uber DS experience & 11-unit RE portfolio</div>
+    <div class="hero-stats">
+        <div class="hero-stat">
+            <div class="number">12</div>
+            <div class="label">Target Incubators</div>
+        </div>
+        <div class="hero-stat">
+            <div class="number">5</div>
+            <div class="label">Venture Ideas</div>
+        </div>
+        <div class="hero-stat">
+            <div class="number" id="yc-days">10</div>
+            <div class="label">Days to YC Deadline</div>
+        </div>
+        <div class="hero-stat">
+            <div class="number">$2.5M+</div>
+            <div class="label">Potential Funding</div>
+        </div>
+    </div>
+</div>
+
+<!-- Urgency Banner -->
+<div class="urgency-banner">
+    ⚡ URGENT: Y Combinator Summer 2026 deadline is <strong>May 4, 2026</strong> — <span id="countdown-text"></span> remaining! Apply NOW for the best chance.
+</div>
+
+<!-- Navigation -->
+<div class="nav-tabs">
+    <div class="nav-tab active" onclick="showSection('incubators')">🏢 Incubators</div>
+    <div class="nav-tab" onclick="showSection('ideas')">💡 Venture Ideas</div>
+    <div class="nav-tab" onclick="showSection('strategy')">🎯 Strategy</div>
+    <div class="nav-tab" onclick="showSection('timeline')">📅 Timeline</div>
+    <div class="nav-tab" onclick="showSection('artifacts')">📋 Artifacts</div>
+    <div class="nav-tab" onclick="showSection('profile')">👤 Founder Edge</div>
+    <div class="nav-tab" onclick="showSection('comparison')">📊 Compare</div>
+    <div class="nav-tab" onclick="showSection('ycapp')">📝 YC Application</div>
+</div>
+
+<div class="content">
+
+<!-- ============================================ -->
+<!-- SECTION 1: INCUBATORS -->
+<!-- ============================================ -->
+<div class="section active" id="incubators">
+    <h2 class="section-title">🏢 Target Incubators — Ranked by Strategic Fit</h2>
+    <p class="section-subtitle">Curated list of 12 incubators/accelerators optimized for a pre-revenue Real Estate AI startup with a technical founder</p>
+
+    <!-- Tier 1 -->
+    <h3 style="margin: 20px 0 15px; color: var(--accent);">🏆 TIER 1 — Must Apply (Highest Network Value)</h3>
+    <div class="card-grid">
+
+        <!-- YC -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Y Combinator</h3>
+                <span class="tag tag-urgent">⚡ 10 DAYS LEFT</span>
+            </div>
+            <div class="card-detail"><span class="icon">💰</span> <strong>$500,000</strong> for 7% equity</div>
+            <div class="card-detail"><span class="icon">📅</span> <strong>Deadline: May 4, 2026</strong> (Summer 2026 batch)</div>
+            <div class="card-detail"><span class="icon">📍</span> San Francisco, CA (Jul–Sep 2026)</div>
+            <div class="card-detail"><span class="icon">⏱️</span> 3-month program + Demo Day</div>
+            <div class="card-detail"><span class="icon">🎓</span> 25,000+ alumni network (Airbnb, Stripe, DoorDash)</div>
+            <div class="card-detail"><span class="icon">📊</span> ~3% acceptance rate, ~13,000 applicants/batch</div>
+            <div class="card-detail"><span class="icon">🔗</span> <a href="https://www.ycombinator.com/apply" target="_blank">Apply Here</a></div>
+            <div class="badge-row">
+                <span class="mini-badge" style="background:#ffe0e6;color:#e94560;">Pre-revenue OK</span>
+                <span class="mini-badge" style="background:#e8f5e9;color:#27ae60;">Solo founder OK</span>
+                <span class="mini-badge" style="background:#e0f0ff;color:#3498db;">#1 Network</span>
+            </div>
+            <div class="fit-score">
+                <span style="font-size:0.85em;">Fit Score:</span>
+                <div class="fit-bar"><div class="fit-fill" style="width:95%;background:linear-gradient(90deg,#27ae60,#2ecc71);"></div></div>
+                <span class="fit-label" style="color:#27ae60;">95%</span>
+            </div>
+        </div>
+
+        <!-- Techstars -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Techstars</h3>
+                <span class="tag tag-high">JUN 10</span>
+            </div>
+            <div class="card-detail"><span class="icon">💰</span> <strong>$120,000</strong> for 6% equity</div>
+            <div class="card-detail"><span class="icon">📅</span> <strong>Deadline: Jun 10, 2026</strong> (multiple programs)</div>
+            <div class="card-detail"><span class="icon">📍</span> NYC, Boulder, Boston, Anywhere (remote)</div>
+            <div class="card-detail"><span class="icon">⏱️</span> 3-month program + Demo Day</div>
+            <div class="card-detail"><span class="icon">🎓</span> 4,400+ companies, $98B+ market cap portfolio</div>
+            <div class="card-detail"><span class="icon">📊</span> ~1% acceptance rate</div>
+            <div class="card-detail"><span class="icon">🔗</span> <a href="https://www.techstars.com/accelerators" target="_blank">Apply Here</a></div>
+            <div class="badge-row">
+                <span class="mini-badge" style="background:#e0f0ff;color:#3498db;">Strong NYC network</span>
+                <span class="mini-badge" style="background:#fff3e0;color:#f5a623;">Industry-specific tracks</span>
+            </div>
+            <div class="fit-score">
+                <span style="font-size:0.85em;">Fit Score:</span>
+                <div class="fit-bar"><div class="fit-fill" style="width:85%;background:linear-gradient(90deg,#27ae60,#2ecc71);"></div></div>
+                <span class="fit-label" style="color:#27ae60;">85%</span>
+            </div>
+        </div>
+
+        <!-- a16z START -->
+        <div class="card">
+            <div class="card-header">
+                <h3>a16z Speedrun (CSX)</h3>
+                <span class="tag tag-top">ELITE</span>
+            </div>
+            <div class="card-detail"><span class="icon">💰</span> <strong>$750,000</strong> for ~7% equity</div>
+            <div class="card-detail"><span class="icon">📅</span> <strong>Rolling admissions</strong> — apply anytime</div>
+            <div class="card-detail"><span class="icon">📍</span> San Francisco, CA</div>
+            <div class="card-detail"><span class="icon">⏱️</span> 8-week sprint program</div>
+            <div class="card-detail"><span class="icon">🎓</span> a16z partner network, enterprise intros</div>
+            <div class="card-detail"><span class="icon">📊</span> Highly selective, technical founders preferred</div>
+            <div class="card-detail"><span class="icon">🔗</span> <a href="https://speedrun.a16z.com" target="_blank">Apply Here</a></div>
+            <div class="badge-row">
+                <span class="mini-badge" style="background:#f3e5f5;color:#9b59b6;">Technical founders 🎯</span>
+                <span class="mini-badge" style="background:#e8f5e9;color:#27ae60;">AI/ML focus</span>
+            </div>
+            <div class="fit-score">
+                <span style="font-size:0.85em;">Fit Score:</span>
+                <div class="fit-bar"><div class="fit-fill" style="width:90%;background:linear-gradient(90deg,#27ae60,#2ecc71);"></div></div>
+                <span class="fit-label" style="color:#27ae60;">90%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tier 2 -->
+    <h3 style="margin: 30px 0 15px; color: var(--blue);">🥈 TIER 2 — High Value (PropTech & AI Specialists)</h3>
+    <div class="card-grid">
+
+        <!-- MetaProp -->
+        <div class="card">
+            <div class="card-header">
+                <h3>MetaProp Accelerator</h3>
+                <span class="tag tag-proptech">PROPTECH #1</span>
+            </div>
+            <div class="card-detail"><span class="icon">💰</span> <strong>Up to $250,000</strong> in financing</div>
+            <div class="card-detail"><span class="icon">📅</span> <strong>Applications: ~Jul 2026</strong> (annual cycle)</div>
+            <div class="card-detail"><span class="icon">📍</span> Columbia University, New York City</div>
+            <div class="card-detail"><span class="icon">⏱️</span> 22-week program + Demo Day + Pilot Days</div>
+            <div class="card-detail"><span class="icon">🎓</span> RE200 mentor network, C-level industry mentors</div>
+            <div class="card-detail"><span class="icon">📊</span> World's premier PropTech accelerator</div>
+            <div class="card-detail"><span class="icon">🔗</span> <a href="https://www.metaprop.vc/accelerator" target="_blank">Apply Here</a></div>
+            <div class="badge-row">
+                <span class="mini-badge" style="background:#e8f5e9;color:#27ae60;">PropTech PERFECT FIT</span>
+                <span class="mini-badge" style="background:#e0f0ff;color:#3498db;">Industry pilots</span>
+            </div>
+            <div class="fit-score">
+                <span style="font-size:0.85em;">Fit Score:</span>
+                <div class="fit-bar"><div class="fit-fill" style="width:97%;background:linear-gradient(90deg,#e94560,#ff6b6b);"></div></div>
+                <span class="fit-label" style="color:#e94560;">97%</span>
+            </div>
+        </div>
+
+        <!-- Antler -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Antler</h3>
+                <span class="tag tag-medium">ROLLING</span>
+            </div>
+            <div class="card-detail"><span class="icon">💰</span> <strong>$100,000–$190,000</strong> pre-seed</div>
+            <div class="card-detail"><span class="icon">📅</span> <strong>Rolling cohorts</strong> — multiple per year</div>
+            <div class="card-detail"><span class="icon">📍</span> 27 cities globally (NYC, SF, Austin)</div>
+            <div class="card-detail"><span class="icon">⏱️</span> 6-month residency program</div>
+            <div class="card-detail"><span class="icon">🎓</span> Global network, co-founder matching available</div>
+            <div class="card-detail"><span class="icon">📊</span> Great for solo founders seeking co-founders</div>
+            <div class="card-detail"><span class="icon">🔗</span> <a href="https://www.antler.co" target="_blank">Apply Here</a></div>
+            <div class="badge-row">
+                <span class="mini-badge" style="background:#fff3e0;color:#f5a623;">Co-founder matching</span>
+                <span class="mini-badge" style="background:#e8f5e9;color:#27ae60;">Solo founder friendly</span>
+            </div>
+            <div class="fit-score">
+                <span style="font-size:0.85em;">Fit Score:</span>
+                <div class="fit-bar"><div class="fit-fill" style="width:80%;background:linear-gradient(90deg,#3498db,#5dade2);"></div></div>
+                <span class="fit-label" style="color:#3498db;">80%</span>
+            </div>
+        </div>
+
+        <!-- Plug and Play -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Plug and Play RE</h3>
+                <span class="tag tag-proptech">PROPTECH</span>
+            </div>
+            <div class="card-detail"><span class="icon">💰</span> <strong>$25K–$500K</strong> (no equity for program)</div>
+            <div class="card-detail"><span class="icon">📅</span> <strong>Rolling applications</strong></div>
+            <div class="card-detail"><span class="icon">📍</span> Sunnyvale, CA (Silicon Valley HQ)</div>
+            <div class="card-detail"><span class="icon">⏱️</span> 12-week program, corporate partner pilots</div>
+            <div class="card-detail"><span class="icon">🎓</span> 500+ corporate partners, RE-specific vertical</div>
+            <div class="card-detail"><span class="icon">📊</span> No equity taken for accelerator participation</div>
+            <div class="card-detail"><span class="icon">🔗</span> <a href="https://www.plugandplaytechcenter.com/real-estate" target="_blank">Apply Here</a></div>
+            <div class="badge-row">
+                <span class="mini-badge" style="background:#e8f5e9;color:#27ae60;">No equity!</span>
+                <span class="mini-badge" style="background:#e0f0ff;color:#3498db;">Corporate pilots</span>
+            </div>
+            <div class="fit-score">
+                <span style="font-size:0.85em;">Fit Score:</span>
+                <div class="fit-bar"><div class="fit-fill" style="width:82%;background:linear-gradient(90deg,#3498db,#5dade2);"></div></div>
+                <span class="fit-label" style="color:#3498db;">82%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tier 3 -->
+    <h3 style="margin: 30px 0 15px; color: var(--green);">🥉 TIER 3 — Strategic Options</h3>
+    <div class="card-grid">
+
+        <!-- 500 Global -->
+        <div class="card">
+            <div class="card-header">
+                <h3>500 Global</h3>
+                <span class="tag tag-medium">ROLLING</span>
+            </div>
+            <div class="card-detail"><span class="icon">💰</span> <strong>$150,000</strong> for ~5-6% equity</div>
+            <div class="card-detail"><span class="icon">📅</span> Rolling admissions, multiple batches/year</div>
+            <div class="card-detail"><span class="icon">📍</span> San Francisco + global</div>
+            <div class="card-detail"><span class="icon">⏱️</span> 4-month program</div>
+            <div class="card-detail"><span class="icon">🎓</span> 2,800+ companies, 80+ countries</div>
+            <div class="fit-score">
+                <span style="font-size:0.85em;">Fit Score:</span>
+                <div class="fit-bar"><div class="fit-fill" style="width:72%;background:linear-gradient(90deg,#f5a623,#f7c56e);"></div></div>
+                <span class="fit-label" style="color:#f5a623;">72%</span>
+            </div>
+        </div>
+
+        <!-- SOSV -->
+        <div class="card">
+            <div class="card-header">
+                <h3>SOSV (HAX / IndieBio)</h3>
+                <span class="tag tag-medium">ROLLING</span>
+            </div>
+            <div class="card-detail"><span class="icon">💰</span> <strong>$100K–$250K</strong></div>
+            <div class="card-detail"><span class="icon">📅</span> Multiple programs per year</div>
+            <div class="card-detail"><span class="icon">📍</span> SF, NYC, Asia</div>
+            <div class="card-detail"><span class="icon">⏱️</span> Deep-tech focused programs</div>
+            <div class="card-detail"><span class="icon">🎓</span> 1,100+ portfolio companies</div>
+            <div class="fit-score">
+                <span style="font-size:0.85em;">Fit Score:</span>
+                <div class="fit-bar"><div class="fit-fill" style="width:65%;background:linear-gradient(90deg,#f5a623,#f7c56e);"></div></div>
+                <span class="fit-label" style="color:#f5a623;">65%</span>
+            </div>
+        </div>
+
+        <!-- Neo -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Neo</h3>
+                <span class="tag tag-medium">ROLLING</span>
+            </div>
+            <div class="card-detail"><span class="icon">💰</span> <strong>$100K–$500K</strong></div>
+            <div class="card-detail"><span class="icon">📅</span> Rolling applications</div>
+            <div class="card-detail"><span class="icon">📍</span> San Francisco</div>
+            <div class="card-detail"><span class="icon">⏱️</span> Community-driven, technical founders</div>
+            <div class="card-detail"><span class="icon">🎓</span> Ali Partovi network (Dropbox, Airbnb, Facebook)</div>
+            <div class="fit-score">
+                <span style="font-size:0.85em;">Fit Score:</span>
+                <div class="fit-bar"><div class="fit-fill" style="width:70%;background:linear-gradient(90deg,#f5a623,#f7c56e);"></div></div>
+                <span class="fit-label" style="color:#f5a623;">70%</span>
+            </div>
+        </div>
+
+        <!-- Fifth Wall -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Fifth Wall</h3>
+                <span class="tag tag-proptech">PROPTECH VC</span>
+            </div>
+            <div class="card-detail"><span class="icon">💰</span> <strong>$500K–$5M</strong> (VC fund, not accelerator)</div>
+            <div class="card-detail"><span class="icon">📅</span> Ongoing — pitch when ready</div>
+            <div class="card-detail"><span class="icon">📍</span> Los Angeles, CA</div>
+            <div class="card-detail"><span class="icon">⏱️</span> Largest PropTech-focused VC globally</div>
+            <div class="card-detail"><span class="icon">🎓</span> Strategic LPs: CBRE, Hines, Lennar, Equity Residential</div>
+            <div class="fit-score">
+                <span style="font-size:0.85em;">Fit Score:</span>
+                <div class="fit-bar"><div class="fit-fill" style="width:88%;background:linear-gradient(90deg,#27ae60,#2ecc71);"></div></div>
+                <span class="fit-label" style="color:#27ae60;">88%</span>
+            </div>
+        </div>
+
+        <!-- Moderne Ventures -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Moderne Ventures</h3>
+                <span class="tag tag-proptech">PROPTECH</span>
+            </div>
+            <div class="card-detail"><span class="icon">💰</span> <strong>$50K–$1M</strong></div>
+            <div class="card-detail"><span class="icon">📅</span> <strong>Biannual cohorts</strong></div>
+            <div class="card-detail"><span class="icon">📍</span> Chicago, IL</div>
+            <div class="card-detail"><span class="icon">⏱️</span> 4-month Passport Program</div>
+            <div class="card-detail"><span class="icon">🎓</span> 250+ RE/insurance industry LPs for pilot ops</div>
+            <div class="fit-score">
+                <span style="font-size:0.85em;">Fit Score:</span>
+                <div class="fit-bar"><div class="fit-fill" style="width:78%;background:linear-gradient(90deg,#3498db,#5dade2);"></div></div>
+                <span class="fit-label" style="color:#3498db;">78%</span>
+            </div>
+        </div>
+
+        <!-- Shadow Ventures -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Shadow Ventures</h3>
+                <span class="tag tag-proptech">PROPTECH VC</span>
+            </div>
+            <div class="card-detail"><span class="icon">💰</span> <strong>$250K–$1M</strong> seed checks</div>
+            <div class="card-detail"><span class="icon">📅</span> Rolling — pitch when ready</div>
+            <div class="card-detail"><span class="icon">📍</span> Remote / US-based</div>
+            <div class="card-detail"><span class="icon">⏱️</span> PropTech & ConstructionTech focused</div>
+            <div class="card-detail"><span class="icon">🎓</span> Deep RE industry network</div>
+            <div class="fit-score">
+                <span style="font-size:0.85em;">Fit Score:</span>
+                <div class="fit-bar"><div class="fit-fill" style="width:75%;background:linear-gradient(90deg,#3498db,#5dade2);"></div></div>
+                <span class="fit-label" style="color:#3498db;">75%</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 2: VENTURE IDEAS -->
+<!-- ============================================ -->
+<div class="section" id="ideas">
+    <h2 class="section-title">💡 Top 5 Venture Ideas for RE × AI</h2>
+    <p class="section-subtitle">Ranked by market potential, defensibility, and alignment with your unique background</p>
+
+    <div class="highlight-box">
+        <h4>🔑 Your Unfair Advantage</h4>
+        <p>You're not just another AI founder — you have <strong>proven domain expertise</strong> with an 11-unit portfolio built using ML, plus <strong>world-class technical credentials</strong> from Amazon & Uber data science. This combination is extremely rare and valuable. The best idea is one that weaponizes BOTH.</p>
+    </div>
+
+    <!-- Idea 1 -->
+    <div class="idea-card">
+        <h3>🥇 1. AI-Powered Real Estate Investment Intelligence Platform</h3>
+        <div class="idea-tagline">"Bloomberg Terminal for Real Estate Investors" — Democratizing institutional-grade RE analytics</div>
+        <p><strong>The Problem:</strong> Individual RE investors and small PE shops make $100K+ decisions using Zillow, spreadsheets, and gut feeling. Institutional players have unfair advantages with proprietary data science teams and $500K+ analytics platforms.</p>
+        <p style="margin-top:10px;"><strong>The Solution:</strong> An AI platform that provides institutional-grade investment analytics to individual investors and small funds. Uses ML to predict property cash flow, appreciation, neighborhood trajectories, optimal rent pricing, and portfolio risk — exactly what YOU built for your own portfolio, productized.</p>
+        <p style="margin-top:10px;"><strong>Why This Wins:</strong></p>
+        <ul style="margin-left:20px;">
+            <li><strong>Founder-market fit is 10/10</strong> — you literally built and proved this for yourself with 11 units</li>
+            <li><strong>Pre-revenue is OK</strong> because you have the ultimate proof of concept: YOUR portfolio</li>
+            <li><strong>$20T+ US RE market</strong> — even a tiny slice is massive</li>
+            <li><strong>Network effects & data moats</strong> get stronger over time</li>
+            <li><strong>Recurring revenue</strong> SaaS model ($99-499/mo per user)</li>
+        </ul>
+        <div class="idea-metrics">
+            <div class="idea-metric">TAM: <strong>$15B+</strong></div>
+            <div class="idea-metric">Model: <strong>SaaS</strong></div>
+            <div class="idea-metric">Moat: <strong>Data + ML models</strong></div>
+            <div class="idea-metric">Time to MVP: <strong>2-3 months</strong></div>
+            <div class="idea-metric">YC Fit: <strong>⭐⭐⭐⭐⭐</strong></div>
+        </div>
+    </div>
+
+    <!-- Idea 2 -->
+    <div class="idea-card">
+        <h3>🥈 2. AI Underwriting Co-Pilot for Property Acquisitions</h3>
+        <div class="idea-tagline">"10x faster property underwriting with AI" — replacing 40-hour analysis with 40-second intelligence</div>
+        <p><strong>The Problem:</strong> Commercial RE underwriting takes 20-40 hours per property. Analysts manually pull comps, model cash flows, stress-test assumptions, and build pro formas. 95% of deals analyzed never close.</p>
+        <p style="margin-top:10px;"><strong>The Solution:</strong> AI agent that ingests a property listing/address and instantly generates a complete institutional-grade underwriting package: financial model, comp analysis, risk scoring, neighborhood analytics, and investment recommendation. Integrates with CoStar, MLS, and public records.</p>
+        <div class="idea-metrics">
+            <div class="idea-metric">TAM: <strong>$8B+</strong></div>
+            <div class="idea-metric">Model: <strong>SaaS + Usage</strong></div>
+            <div class="idea-metric">Moat: <strong>Proprietary models + data</strong></div>
+            <div class="idea-metric">Time to MVP: <strong>3-4 months</strong></div>
+            <div class="idea-metric">YC Fit: <strong>⭐⭐⭐⭐⭐</strong></div>
+        </div>
+    </div>
+
+    <!-- Idea 3 -->
+    <div class="idea-card">
+        <h3>🥉 3. Predictive Property Management AI</h3>
+        <div class="idea-tagline">"Autopilot for landlords" — ML-driven property management that maximizes NOI</div>
+        <p><strong>The Problem:</strong> Small-to-mid landlords (1-50 units) leave 15-25% of potential NOI on the table through suboptimal rent pricing, poor maintenance timing, bad tenant screening, and inefficient operations.</p>
+        <p style="margin-top:10px;"><strong>The Solution:</strong> AI property management platform that continuously optimizes: dynamic rent pricing, predictive maintenance scheduling, AI tenant screening/scoring, automated lease optimization, and cash flow forecasting. Think "what Uber's surge pricing did for rides, but for rent optimization."</p>
+        <div class="idea-metrics">
+            <div class="idea-metric">TAM: <strong>$22B+</strong></div>
+            <div class="idea-metric">Model: <strong>SaaS per door</strong></div>
+            <div class="idea-metric">Moat: <strong>Network effects + ML</strong></div>
+            <div class="idea-metric">Time to MVP: <strong>2-3 months</strong></div>
+            <div class="idea-metric">YC Fit: <strong>⭐⭐⭐⭐</strong></div>
+        </div>
+    </div>
+
+    <!-- Idea 4 -->
+    <div class="idea-card">
+        <h3>4. AI-First Real Estate Brokerage (Buyer's Agent Disruptor)</h3>
+        <div class="idea-tagline">"AI agent that finds your next investment property" — the NAR settlement creates a window</div>
+        <p><strong>The Problem:</strong> Post-NAR settlement, buyer agent commissions are unbundling. Investors struggle to find deals that match their exact criteria across thousands of listings. Traditional agents don't think in terms of cap rates and cash-on-cash returns.</p>
+        <p style="margin-top:10px;"><strong>The Solution:</strong> AI investment property concierge that understands investor-specific criteria (cap rate, cash flow, appreciation potential, 1031 exchange requirements) and proactively surfaces opportunities with full financial analysis. Charges flat fee or reduced commission vs traditional 2.5-3%.</p>
+        <div class="idea-metrics">
+            <div class="idea-metric">TAM: <strong>$100B+</strong></div>
+            <div class="idea-metric">Model: <strong>Transaction fees</strong></div>
+            <div class="idea-metric">Moat: <strong>Data + UX + brand</strong></div>
+            <div class="idea-metric">Time to MVP: <strong>4-6 months</strong></div>
+            <div class="idea-metric">YC Fit: <strong>⭐⭐⭐⭐</strong></div>
+        </div>
+    </div>
+
+    <!-- Idea 5 -->
+    <div class="idea-card">
+        <h3>5. RE Portfolio Optimization Engine (Robo-Advisor for Real Estate)</h3>
+        <div class="idea-tagline">"Wealthfront for rental properties" — algorithmic portfolio construction for RE investors</div>
+        <p><strong>The Problem:</strong> RE investors build portfolios ad hoc. No tool exists to model cross-property correlations, geographic diversification, debt optimization across a portfolio, or tax-efficient acquisition sequencing.</p>
+        <p style="margin-top:10px;"><strong>The Solution:</strong> Portfolio-level optimization engine that treats real estate like a quantitative asset class. Recommends what to buy/sell/refi, optimal leverage ratios, geographic diversification, and tax strategies — exactly the methodology you used to build your 11-unit portfolio.</p>
+        <div class="idea-metrics">
+            <div class="idea-metric">TAM: <strong>$5B+</strong></div>
+            <div class="idea-metric">Model: <strong>AUM fee + SaaS</strong></div>
+            <div class="idea-metric">Moat: <strong>Proprietary algorithms</strong></div>
+            <div class="idea-metric">Time to MVP: <strong>3-4 months</strong></div>
+            <div class="idea-metric">YC Fit: <strong>⭐⭐⭐⭐</strong></div>
+        </div>
+    </div>
+
+    <div class="highlight-box">
+        <h4>💡 My #1 Recommendation for YC Application</h4>
+        <p><strong>Lead with Idea #1 (AI Investment Intelligence Platform)</strong> because it has the strongest founder-market fit story. Your personal 11-unit portfolio IS the proof that the ML approach works. You can tell YC: "I built this for myself, proved it works with real money, and now I'm productizing it for the 10M+ individual RE investors in the US." That's the kind of story that gets you past the application screen AND wins the interview.</p>
+        <p style="margin-top:8px;">If you want a more focused B2B play, <strong>Idea #2 (AI Underwriting Co-Pilot)</strong> is also extremely strong because enterprise willingness-to-pay is very high ($50K+/year per seat).</p>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 3: STRATEGY -->
+<!-- ============================================ -->
+<div class="section" id="strategy">
+    <h2 class="section-title">🎯 Application & Fundraising Strategy</h2>
+    <p class="section-subtitle">Multi-pronged approach to maximize your chances of getting into a top-tier incubator</p>
+
+    <div class="profile-section">
+        <h3>🎯 Overall Strategy: "Spray & Focus"</h3>
+        <p>Apply to 6-8 programs simultaneously to maximize optionality, but invest 70% of your application effort into YC and MetaProp — they offer the best network × relevance combination for your specific profile.</p>
+        <div style="margin-top:15px;">
+            <p><strong>Phase 1 (Now → May 4):</strong> 🔴 YC application — this is your #1 priority</p>
+            <p><strong>Phase 2 (May → Jun):</strong> 🟡 Techstars, Antler, 500 Global, a16z Speedrun applications</p>
+            <p><strong>Phase 3 (Jun → Jul):</strong> 🟢 MetaProp, Plug & Play, Moderne Ventures, PropTech VCs</p>
+        </div>
+    </div>
+
+    <div class="strategy-grid">
+        <div class="strategy-box">
+            <h3>🔥 What Makes You Stand Out</h3>
+            <ul>
+                <li><strong>Rare founder archetype:</strong> Technical (Sr. DS at Amazon/Uber) + Domain expert (11-unit portfolio) is unicorn-rare in PropTech</li>
+                <li><strong>Proof of concept exists:</strong> Your personal portfolio IS the proof that ML-driven RE investing works</li>
+                <li><strong>Skin in the game:</strong> You invested your own money using your algorithms — ultimate conviction signal</li>
+                <li><strong>FAANG pedigree:</strong> Amazon + Uber signals you can build production ML systems at scale</li>
+                <li><strong>Market timing:</strong> AI hype cycle + post-NAR settlement disruption = perfect window</li>
+            </ul>
+        </div>
+
+        <div class="strategy-box">
+            <h3>⚠️ Potential Weaknesses to Address</h3>
+            <ul>
+                <li><strong>Solo founder:</strong> YC prefers teams (but accepts solos). Consider finding a co-founder or framing why solo is OK for now</li>
+                <li><strong>Pre-revenue:</strong> Mitigate by showing your personal portfolio as proof of concept + early waitlist signups</li>
+                <li><strong>No product yet:</strong> Build a compelling demo or landing page before applying. Even a Figma prototype helps.</li>
+                <li><strong>Market skepticism:</strong> RE tech has had failures (Zillow iBuying). Have a clear answer for "why is this different?"</li>
+                <li><strong>Full-time job:</strong> If still at Amazon, be ready to commit to full-time. YC strongly prefers this.</li>
+            </ul>
+        </div>
+
+        <div class="strategy-box">
+            <h3>🎤 Interview Preparation (YC 10-min format)</h3>
+            <ul>
+                <li><strong>60-second pitch:</strong> Practice until it's razor sharp. Lead with the personal story.</li>
+                <li><strong>Know your numbers:</strong> Portfolio ROI, market size, unit economics, growth projections</li>
+                <li><strong>"Why now?"</strong> AI capabilities + post-NAR settlement + interest rate environment</li>
+                <li><strong>"Why you?"</strong> Only founder who has BOTH built ML systems at Amazon scale AND successfully invested using them</li>
+                <li><strong>Show velocity:</strong> What have you shipped in the last 2 weeks? Show momentum.</li>
+                <li><strong>Demo something:</strong> Even a Jupyter notebook showing your ML model beating market benchmarks is powerful</li>
+            </ul>
+        </div>
+
+        <div class="strategy-box">
+            <h3>💰 VC Strategy Post-Incubator</h3>
+            <ul>
+                <li><strong>Target raise:</strong> $1.5M–$3M seed round post-Demo Day</li>
+                <li><strong>PropTech VCs:</strong> Fifth Wall, MetaProp, Shadow Ventures, Moderne, Camber Creek</li>
+                <li><strong>AI VCs:</strong> a16z, Sequoia (AI fund), Greylock, Khosla Ventures</li>
+                <li><strong>RE Angels:</strong> Target successful RE tech founders (Zillow, Redfin, CoStar alumni)</li>
+                <li><strong>Demo Day strategy:</strong> Create FOMO with oversubscribed round narrative</li>
+                <li><strong>Valuation target:</strong> $10-15M post-money for seed (achievable with YC stamp)</li>
+            </ul>
+        </div>
+    </div>
+
+    <div style="margin-top:30px;">
+        <h3 style="margin-bottom:15px;">🌐 Network Building Actions (Start Immediately)</h3>
+        <div class="strategy-grid">
+            <div class="strategy-box">
+                <h3>📱 Before Application</h3>
+                <ul>
+                    <li>Join YC's Startup School (free) for community access</li>
+                    <li>Connect with YC alumni on LinkedIn who are in PropTech</li>
+                    <li>Post your RE+AI thesis on Twitter/X to build audience</li>
+                    <li>Reach out to MetaProp partners on LinkedIn with warm context</li>
+                    <li>Join CREtech and PropTech communities on Slack/Discord</li>
+                    <li>Attend local RE investor meetups and pitch your idea</li>
+                </ul>
+            </div>
+            <div class="strategy-box">
+                <h3>🤝 After Acceptance</h3>
+                <ul>
+                    <li>Immediately start building relationships with batch-mates</li>
+                    <li>Request intros to PropTech VCs through YC/program partners</li>
+                    <li>Get 5-10 design partners (RE investors) for beta testing</li>
+                    <li>Build in public on Twitter/X to create pre-Demo Day buzz</li>
+                    <li>Start fundraising conversations 4 weeks before Demo Day</li>
+                    <li>Target 50+ investor meetings in Demo Day week</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 4: TIMELINE -->
+<!-- ============================================ -->
+<div class="section" id="timeline">
+    <h2 class="section-title">📅 Application Timeline & Action Plan</h2>
+    <p class="section-subtitle">Week-by-week roadmap from now through Demo Day</p>
+
+    <div class="countdown" id="yc-countdown"></div>
+
+    <div class="timeline">
+        <div class="timeline-item" style="border-left:4px solid #e94560;">
+            <div class="timeline-date">🔴 NOW → April 30, 2026 (THIS WEEK)</div>
+            <div class="timeline-title">YC Application Sprint</div>
+            <p>Complete YC Summer 2026 application. This is your <strong>#1 priority</strong>.</p>
+            <ul style="margin-top:8px;margin-left:20px;">
+                <li>Record 1-minute founder video (required by YC)</li>
+                <li>Write concise answers to all YC application questions</li>
+                <li>Create a simple demo/landing page for your product</li>
+                <li>Get 2-3 trusted people to review your application</li>
+                <li>Submit by April 30 to be safe (deadline May 4)</li>
+            </ul>
+        </div>
+
+        <div class="timeline-item" style="border-left:4px solid #e94560;">
+            <div class="timeline-date">🔴 May 1–4, 2026</div>
+            <div class="timeline-title">YC Submission & Techstars Prep</div>
+            <p>Final YC submission. Begin Techstars applications.</p>
+            <ul style="margin-top:8px;margin-left:20px;">
+                <li>Submit YC application (deadline May 4, 8pm PT)</li>
+                <li>Start Techstars NYC/Anywhere applications (deadline Jun 10)</li>
+                <li>Apply to a16z Speedrun (rolling)</li>
+                <li>Build landing page with email capture for your product</li>
+            </ul>
+        </div>
+
+        <div class="timeline-item" style="border-left:4px solid #f5a623;">
+            <div class="timeline-date">🟡 May 5–31, 2026</div>
+            <div class="timeline-title">Application Blitz + MVP Development</div>
+            <p>Submit remaining applications while building your MVP.</p>
+            <ul style="margin-top:8px;margin-left:20px;">
+                <li>Complete Techstars applications (NYC, Anywhere, Boulder)</li>
+                <li>Apply to Antler (rolling cohorts)</li>
+                <li>Apply to 500 Global (rolling)</li>
+                <li>Start building MVP/prototype of your AI platform</li>
+                <li>Collect 50+ email signups for waitlist</li>
+                <li>If YC invites to interview: STOP everything and prepare</li>
+            </ul>
+        </div>
+
+        <div class="timeline-item" style="border-left:4px solid #f5a623;">
+            <div class="timeline-date">🟡 June 2026</div>
+            <div class="timeline-title">YC Interviews + PropTech Applications</div>
+            <p>YC interviews happen May-June. Decision usually same day.</p>
+            <ul style="margin-top:8px;margin-left:20px;">
+                <li>YC interview prep (practice 10-minute format daily)</li>
+                <li>Apply to MetaProp Accelerator (applications typically open ~Jul)</li>
+                <li>Apply to Plug and Play RE vertical (rolling)</li>
+                <li>Apply to Moderne Ventures Passport Program</li>
+                <li>Continue MVP development — aim for working demo</li>
+                <li>Decision from YC by June 5 if applied before deadline</li>
+            </ul>
+        </div>
+
+        <div class="timeline-item" style="border-left:4px solid #27ae60;">
+            <div class="timeline-date">🟢 July–September 2026</div>
+            <div class="timeline-title">Incubator Program (if accepted to YC)</div>
+            <p>YC batch runs July–September in San Francisco.</p>
+            <ul style="margin-top:8px;margin-left:20px;">
+                <li>Move to SF for YC batch (if accepted)</li>
+                <li>Build product intensely — ship weekly</li>
+                <li>Get 10-20 paying beta customers</li>
+                <li>Prepare Demo Day pitch</li>
+                <li>Start fundraising conversations 4 weeks before Demo Day</li>
+            </ul>
+        </div>
+
+        <div class="timeline-item" style="border-left:4px solid #27ae60;">
+            <div class="timeline-date">🟢 October 2026</div>
+            <div class="timeline-title">Demo Day & Seed Round</div>
+            <p>YC Demo Day + raise your seed round.</p>
+            <ul style="margin-top:8px;margin-left:20px;">
+                <li>Demo Day presentation to 1,000+ investors</li>
+                <li>Target $2-3M seed round at $10-15M valuation</li>
+                <li>Leverage YC investor network + PropTech VCs</li>
+                <li>Close round within 2-4 weeks of Demo Day</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 5: ARTIFACTS -->
+<!-- ============================================ -->
+<div class="section" id="artifacts">
+    <h2 class="section-title">📋 Required Artifacts & Preparation Checklist</h2>
+    <p class="section-subtitle">Everything you need to prepare, with priority indicators. Check items off as you complete them.</p>
+
+    <h3 style="margin:20px 0 15px;color:var(--accent);">🔴 Critical — Complete Before YC Deadline (May 4)</h3>
+    <ul class="checklist" id="critical-checklist">
+        <li onclick="this.classList.toggle('completed')">
+            <input type="checkbox"> <div><strong>1-Minute Founder Video</strong><br><small>YC requires this. Be authentic, energetic, and concise. Show your personality. Record with good lighting and audio. Key points: who you are, what you're building, why you're the right person. Mention your Amazon/Uber experience AND your 11-unit portfolio in the first 10 seconds.</small></div>
+        </li>
+        <li onclick="this.classList.toggle('completed')">
+            <input type="checkbox"> <div><strong>YC Application Answers</strong><br><small>Short, clear, compelling answers. YC reads thousands — be concise. Key questions: What are you building? Why this idea? Why now? What's your unfair advantage? Progress so far? For "progress" — your personal portfolio IS progress.</small></div>
+        </li>
+        <li onclick="this.classList.toggle('completed')">
+            <input type="checkbox"> <div><strong>Product Demo / Landing Page</strong><br><small>Even a simple landing page at yourdomain.com showing: (1) the problem, (2) your solution, (3) email signup. A Figma prototype or Jupyter notebook demo showing your ML model's predictions vs actual outcomes on your portfolio is GOLD.</small></div>
+        </li>
+        <li onclick="this.classList.toggle('completed')">
+            <input type="checkbox"> <div><strong>Company Formation</strong><br><small>Incorporate as a Delaware C-Corp (standard for VC-backed startups). Use Stripe Atlas, Clerky, or a lawyer. YC and most VCs require this. Cost: ~$500-800.</small></div>
+        </li>
+    </ul>
+
+    <h3 style="margin:25px 0 15px;color:var(--gold);">🟡 Important — Complete Before Interviews (May-June)</h3>
+    <ul class="checklist" id="important-checklist">
+        <li onclick="this.classList.toggle('completed')">
+            <input type="checkbox"> <div><strong>Pitch Deck (10-12 slides)</strong><br><small>Standard format: Problem → Solution → Market Size → Product → Traction → Business Model → Team → Competitive Landscape → Financial Projections → Ask. Include screenshots of your ML model performance on your own portfolio.</small></div>
+        </li>
+        <li onclick="this.classList.toggle('completed')">
+            <input type="checkbox"> <div><strong>Financial Model (Simple)</strong><br><small>3-year projection showing: user growth → revenue → costs → path to profitability. Key assumptions documented. Show SaaS metrics: MRR, CAC, LTV, churn assumptions.</small></div>
+        </li>
+        <li onclick="this.classList.toggle('completed')">
+            <input type="checkbox"> <div><strong>Competitive Analysis</strong><br><small>Map the landscape: Zillow, Redfin, CoStar, Reonomy, Mashvisor, DealMachine, Stessa, etc. Show your differentiation clearly — AI depth, investor focus, and your personal proof of concept.</small></div>
+        </li>
+        <li onclick="this.classList.toggle('completed')">
+            <input type="checkbox"> <div><strong>Portfolio Case Study</strong><br><small>Document your personal 11-unit portfolio journey: (1) metrics you optimized for, (2) ML models used, (3) results vs market benchmarks, (4) key learnings. This is your most powerful asset — treat it as a published case study.</small></div>
+        </li>
+        <li onclick="this.classList.toggle('completed')">
+            <input type="checkbox"> <div><strong>60-Second Elevator Pitch (memorized)</strong><br><small>"I'm [name], senior data scientist at Amazon, and I used machine learning to build an 11-unit real estate portfolio that outperforms market benchmarks by X%. Now I'm building [product name] to give every RE investor access to the same institutional-grade AI analytics. The $20T US real estate market still runs on spreadsheets and gut feeling."</small></div>
+        </li>
+        <li onclick="this.classList.toggle('completed')">
+            <input type="checkbox"> <div><strong>2-Minute Product Demo Video</strong><br><small>Screen recording showing your product/prototype in action. Even a Jupyter notebook walking through your ML model's analysis of a property is compelling. Use Loom to record.</small></div>
+        </li>
+    </ul>
+
+    <h3 style="margin:25px 0 15px;color:var(--green);">🟢 Nice to Have — Builds Credibility</h3>
+    <ul class="checklist" id="nice-checklist">
+        <li onclick="this.classList.toggle('completed')">
+            <input type="checkbox"> <div><strong>Technical Blog Post / Twitter Thread</strong><br><small>Publish a deep-dive on how you used ML for RE investing. This builds credibility, attracts early users, and gives investors something to reference. Post on Medium, your blog, or Twitter/X.</small></div>
+        </li>
+        <li onclick="this.classList.toggle('completed')">
+            <input type="checkbox"> <div><strong>Waitlist with 100+ Signups</strong><br><small>Create a landing page with email capture. Post in RE investor communities (BiggerPockets, Reddit r/realestateinvesting, etc.). 100+ signups pre-launch is a strong signal.</small></div>
+        </li>
+        <li onclick="this.classList.toggle('completed')">
+            <input type="checkbox"> <div><strong>Letter of Intent from Potential Customers</strong><br><small>Get 3-5 RE investors to write simple LOIs: "I would pay $X/month for this product." Even informal emails count. This de-risks the "will people pay?" question.</small></div>
+        </li>
+        <li onclick="this.classList.toggle('completed')">
+            <input type="checkbox"> <div><strong>GitHub Repository with Open-Source Components</strong><br><small>Open-source some of your RE analytics tools. This builds credibility, attracts talent, and signals technical depth to investors who check your GitHub.</small></div>
+        </li>
+        <li onclick="this.classList.toggle('completed')">
+            <input type="checkbox"> <div><strong>Advisory Board (1-2 people)</strong><br><small>Recruit a RE industry veteran and/or a successful PropTech founder as advisors. Even informal advisors add credibility. Offer 0.25-0.5% advisory shares.</small></div>
+        </li>
+        <li onclick="this.classList.toggle('completed')">
+            <input type="checkbox"> <div><strong>One-Pager / Executive Summary</strong><br><small>Single-page PDF with: Problem, Solution, Market, Team, Ask. Used for cold outreach to investors and partners. Professional design matters here.</small></div>
+        </li>
+    </ul>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 6: FOUNDER PROFILE -->
+<!-- ============================================ -->
+<div class="section" id="profile">
+    <h2 class="section-title">👤 Your Founder Edge — Leveraging Your Background</h2>
+    <p class="section-subtitle">How to position your unique combination of skills for maximum impact</p>
+
+    <div class="profile-section">
+        <h3>🦄 Why You're a Unicorn Founder Profile</h3>
+        <p>In the world of PropTech, there are domain experts (RE professionals building tech) and tech experts (engineers building for RE). You are the extremely rare combination of BOTH — a senior data scientist from two of the world's best data companies who has also successfully deployed those skills in real estate with real money and real results.</p>
+        <div class="strengths-grid">
+            <div class="strength-item">
+                <div class="emoji">🧠</div>
+                <div class="title">Sr. Data Scientist @ Amazon</div>
+                <div class="desc">Production ML, scale, AWS, data pipelines</div>
+            </div>
+            <div class="strength-item">
+                <div class="emoji">🚗</div>
+                <div class="title">Data Science @ Uber</div>
+                <div class="desc">Dynamic pricing, marketplace optimization, geo-spatial ML</div>
+            </div>
+            <div class="strength-item">
+                <div class="emoji">🏘️</div>
+                <div class="title">11-Unit RE Portfolio</div>
+                <div class="desc">Built using ML — the ultimate proof of concept</div>
+            </div>
+            <div class="strength-item">
+                <div class="emoji">📊</div>
+                <div class="title">ML-Optimized Investing</div>
+                <div class="desc">Metric-driven approach proven with real money</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="two-col">
+        <div class="strategy-box">
+            <h3>🎯 Positioning for Different Audiences</h3>
+            <ul>
+                <li><strong>For YC:</strong> "I'm a technical founder who has already proven the idea works with my own money. I used ML to build an 11-unit portfolio, and now I'm productizing it."</li>
+                <li><strong>For MetaProp/PropTech:</strong> "I bridge the gap between institutional-grade data science (Amazon/Uber) and on-the-ground RE investing experience (11 units)."</li>
+                <li><strong>For AI-focused VCs:</strong> "I've built production ML systems at Amazon scale and applied them to a $20T market that's still running on spreadsheets."</li>
+                <li><strong>For RE Industry:</strong> "I'm a fellow landlord who happened to be a data scientist, and I built tools that dramatically improved my own portfolio performance."</li>
+            </ul>
+        </div>
+
+        <div class="strategy-box">
+            <h3>📈 Key Metrics to Prepare</h3>
+            <ul>
+                <li><strong>Portfolio IRR vs market benchmark:</strong> Calculate and share the exact outperformance %</li>
+                <li><strong>Property selection accuracy:</strong> How many properties your ML flagged that became top performers?</li>
+                <li><strong>Rent optimization impact:</strong> How much more revenue did your ML pricing generate vs market rents?</li>
+                <li><strong>Time savings:</strong> Hours saved per property analysis using your tools vs manual analysis</li>
+                <li><strong>Years of experience:</strong> Total years in data science + years in RE investing</li>
+                <li><strong>Properties analyzed:</strong> How many properties has your system analyzed total?</li>
+            </ul>
+        </div>
+    </div>
+
+    <div style="margin-top:25px;">
+        <div class="strategy-box">
+            <h3>🚨 The "Solo Founder" Question — How to Handle It</h3>
+            <ul>
+                <li><strong>Acknowledge it:</strong> "Yes, I'm currently a solo founder, and here's why that's actually an advantage right now..."</li>
+                <li><strong>Frame it positively:</strong> "For a deeply technical AI product, having one person who owns the full stack — from ML model architecture to domain expertise to customer empathy — means we can move 10x faster in these early stages."</li>
+                <li><strong>Show you're open:</strong> "I'm actively looking for a co-founder with complementary skills (go-to-market, sales, product design), and I'd love YC's help finding the right person."</li>
+                <li><strong>Reference precedent:</strong> "Many successful YC companies started as single founders — including Dropbox (Drew Houston), DoorDash (initially), and others."</li>
+                <li><strong>Consider Antler:</strong> Antler's co-founder matching program could pair you with a business-focused co-founder</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 7: COMPARISON TABLE -->
+<!-- ============================================ -->
+<div class="section" id="comparison">
+    <h2 class="section-title">📊 Side-by-Side Incubator Comparison</h2>
+    <p class="section-subtitle">All key metrics at a glance — sortable and comparable</p>
+
+    <table class="comparison-table">
+        <thead>
+            <tr>
+                <th>Incubator</th>
+                <th>Investment</th>
+                <th>Equity</th>
+                <th>Deadline</th>
+                <th>Duration</th>
+                <th>Location</th>
+                <th>Network Value</th>
+                <th>PropTech Fit</th>
+                <th>Priority</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Y Combinator</strong></td>
+                <td>$500K</td>
+                <td>7%</td>
+                <td style="color:#e94560;font-weight:700;">May 4 ⚡</td>
+                <td>3 months</td>
+                <td>San Francisco</td>
+                <td>⭐⭐⭐⭐⭐</td>
+                <td>⭐⭐⭐⭐</td>
+                <td><span class="tag tag-urgent">P0</span></td>
+            </tr>
+            <tr>
+                <td><strong>a16z Speedrun</strong></td>
+                <td>$750K</td>
+                <td>~7%</td>
+                <td>Rolling</td>
+                <td>8 weeks</td>
+                <td>San Francisco</td>
+                <td>⭐⭐⭐⭐⭐</td>
+                <td>⭐⭐⭐</td>
+                <td><span class="tag tag-urgent">P0</span></td>
+            </tr>
+            <tr>
+                <td><strong>MetaProp</strong></td>
+                <td>$250K</td>
+                <td>Varies</td>
+                <td>~Jul 2026</td>
+                <td>22 weeks</td>
+                <td>NYC (Columbia)</td>
+                <td>⭐⭐⭐⭐</td>
+                <td>⭐⭐⭐⭐⭐</td>
+                <td><span class="tag tag-urgent">P0</span></td>
+            </tr>
+            <tr>
+                <td><strong>Techstars</strong></td>
+                <td>$120K</td>
+                <td>6%</td>
+                <td>Jun 10</td>
+                <td>3 months</td>
+                <td>Multiple cities</td>
+                <td>⭐⭐⭐⭐</td>
+                <td>⭐⭐⭐</td>
+                <td><span class="tag tag-high">P1</span></td>
+            </tr>
+            <tr>
+                <td><strong>Plug & Play RE</strong></td>
+                <td>$25K-500K</td>
+                <td>0%!</td>
+                <td>Rolling</td>
+                <td>12 weeks</td>
+                <td>Sunnyvale, CA</td>
+                <td>⭐⭐⭐⭐</td>
+                <td>⭐⭐⭐⭐⭐</td>
+                <td><span class="tag tag-high">P1</span></td>
+            </tr>
+            <tr>
+                <td><strong>Fifth Wall</strong></td>
+                <td>$500K-5M</td>
+                <td>Varies</td>
+                <td>Ongoing</td>
+                <td>VC (no program)</td>
+                <td>Los Angeles</td>
+                <td>⭐⭐⭐⭐⭐</td>
+                <td>⭐⭐⭐⭐⭐</td>
+                <td><span class="tag tag-high">P1</span></td>
+            </tr>
+            <tr>
+                <td><strong>Antler</strong></td>
+                <td>$100-190K</td>
+                <td>Varies</td>
+                <td>Rolling</td>
+                <td>6 months</td>
+                <td>27 global cities</td>
+                <td>⭐⭐⭐</td>
+                <td>⭐⭐⭐</td>
+                <td><span class="tag tag-medium">P2</span></td>
+            </tr>
+            <tr>
+                <td><strong>500 Global</strong></td>
+                <td>$150K</td>
+                <td>5-6%</td>
+                <td>Rolling</td>
+                <td>4 months</td>
+                <td>San Francisco</td>
+                <td>⭐⭐⭐</td>
+                <td>⭐⭐⭐</td>
+                <td><span class="tag tag-medium">P2</span></td>
+            </tr>
+            <tr>
+                <td><strong>Moderne Ventures</strong></td>
+                <td>$50K-1M</td>
+                <td>Varies</td>
+                <td>Biannual</td>
+                <td>4 months</td>
+                <td>Chicago</td>
+                <td>⭐⭐⭐</td>
+                <td>⭐⭐⭐⭐</td>
+                <td><span class="tag tag-medium">P2</span></td>
+            </tr>
+            <tr>
+                <td><strong>Shadow Ventures</strong></td>
+                <td>$250K-1M</td>
+                <td>Varies</td>
+                <td>Rolling</td>
+                <td>VC (no program)</td>
+                <td>Remote / US</td>
+                <td>⭐⭐⭐</td>
+                <td>⭐⭐⭐⭐</td>
+                <td><span class="tag tag-medium">P2</span></td>
+            </tr>
+            <tr>
+                <td><strong>Neo</strong></td>
+                <td>$100-500K</td>
+                <td>Varies</td>
+                <td>Rolling</td>
+                <td>Community</td>
+                <td>San Francisco</td>
+                <td>⭐⭐⭐⭐</td>
+                <td>⭐⭐</td>
+                <td><span class="tag tag-medium">P2</span></td>
+            </tr>
+            <tr>
+                <td><strong>SOSV</strong></td>
+                <td>$100-250K</td>
+                <td>Varies</td>
+                <td>Rolling</td>
+                <td>Varies</td>
+                <td>SF / NYC / Asia</td>
+                <td>⭐⭐⭐</td>
+                <td>⭐⭐</td>
+                <td><span class="tag tag-medium">P3</span></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="highlight-box">
+        <h4>📊 Key Insight: Apply to BOTH General (YC, Techstars) and PropTech-Specific (MetaProp, Plug & Play)</h4>
+        <p>General accelerators give you the <strong>broadest Silicon Valley network and brand recognition</strong> that opens all doors. PropTech-specific programs give you <strong>deep industry connections, pilot customers, and domain credibility</strong>. The ideal path is: get into YC for the network/brand → then engage PropTech VCs (Fifth Wall, MetaProp's fund) for follow-on capital and strategic value.</p>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 8: YC APPLICATION GUIDE -->
+<!-- ============================================ -->
+<div class="section" id="ycapp">
+    <h2 class="section-title">📝 YC Application — Answer Guide</h2>
+    <p class="section-subtitle">Frameworks and sample answers for every key YC application question</p>
+
+    <div class="highlight-box">
+        <h4>⚡ YC Application Philosophy</h4>
+        <p>YC partners read thousands of applications. They value: <strong>(1) Clarity</strong> — say exactly what you do in one sentence. <strong>(2) Insight</strong> — show you know something others don't. <strong>(3) Evidence</strong> — prove you can execute. <strong>(4) Speed</strong> — show you move fast. Keep every answer SHORT and PUNCHY.</p>
+    </div>
+
+    <div class="idea-card" style="border-left-color:#e94560;">
+        <h3>Q: "Describe what your company does in 50 characters or less"</h3>
+        <p style="margin-top:10px;"><strong>Framework:</strong> [Action verb] + [for whom] + [with what technology]</p>
+        <p style="margin-top:8px;"><strong>Examples:</strong></p>
+        <ul style="margin-left:20px;">
+            <li>"AI investment analytics for real estate investors"</li>
+            <li>"ML-powered underwriting for property acquisitions"</li>
+            <li>"Bloomberg Terminal for rental property investors"</li>
+        </ul>
+    </div>
+
+    <div class="idea-card" style="border-left-color:#3498db;">
+        <h3>Q: "What is your company going to make?"</h3>
+        <p style="margin-top:10px;"><strong>Framework:</strong> Problem → Solution → Why it's 10x better</p>
+        <p style="margin-top:8px;"><strong>Sample:</strong> "We're building an AI platform that gives individual real estate investors the same analytical edge that institutional firms have with their $500K+ data science teams. Our ML models analyze property cash flow potential, neighborhood trajectories, and portfolio risk in seconds — replacing the 20-40 hour manual underwriting process. I built this system for my own investing and used it to construct an 11-unit portfolio. Now I'm productizing it for the 10M+ individual RE investors in the US who currently rely on Zillow estimates and spreadsheets."</p>
+    </div>
+
+    <div class="idea-card" style="border-left-color:#27ae60;">
+        <h3>Q: "Why did you pick this idea to work on?"</h3>
+        <p style="margin-top:10px;"><strong>Sample:</strong> "Because I lived the problem. As a senior data scientist at Amazon and Uber, I had access to world-class ML tools — but when I started investing in real estate, I was shocked that the entire industry runs on gut feeling and basic spreadsheets. So I built my own ML pipeline to analyze properties, and it worked — I built an 11-unit portfolio that outperforms market benchmarks. Every RE investor I've talked to wants access to this kind of analysis but can't build it themselves. This isn't a theoretical idea — it's a tool I built, used, and proved with real money."</p>
+    </div>
+
+    <div class="idea-card" style="border-left-color:#f5a623;">
+        <h3>Q: "What's new about what you're making?"</h3>
+        <p style="margin-top:10px;"><strong>Sample:</strong> "Three things are new: (1) We use ML models trained on actual investment outcomes, not just listing data — we model cash flows, maintenance costs, tenant quality, and neighborhood trajectories that tools like Zillow completely miss. (2) We're investor-first, not buyer-first — our UX speaks in cap rates, cash-on-cash returns, and portfolio correlations, not 'dream home' features. (3) The founder has literally proven this works by building a profitable portfolio using these exact models — no other PropTech founder can claim this."</p>
+    </div>
+
+    <div class="idea-card" style="border-left-color:#9b59b6;">
+        <h3>Q: "How far along are you?"</h3>
+        <p style="margin-top:10px;"><strong>Sample:</strong> "I've been using the core ML models for my personal investing for [X years], building an 11-unit portfolio. The models are proven and production-ready. I'm now building the user-facing product to make this accessible to any investor. I have a working prototype/landing page at [URL], and [X] people on the waitlist. I'm applying to YC to accelerate the go-to-market and build out the platform."</p>
+        <p style="margin-top:8px;"><em>Note: Adapt this to your actual status. Be honest but frame progress positively. Your portfolio IS your traction.</em></p>
+    </div>
+
+    <div class="idea-card" style="border-left-color:#e74c3c;">
+        <h3>Q: "Who are your competitors?"</h3>
+        <p style="margin-top:10px;"><strong>Sample:</strong> "The market has tools like Zillow (consumer homebuyers, not investors), CoStar ($40K/year, enterprise-only), Mashvisor (basic analytics, no ML), and Stessa (bookkeeping, not intelligence). None of them offer what institutional investors get: ML-driven predictive analytics for investment decisions. The closest competition is actually the in-house data science teams at Blackstone and Brookfield — we're democratizing that capability for the 99% of investors who don't have those teams."</p>
+    </div>
+
+    <div class="idea-card" style="border-left-color:#1abc9c;">
+        <h3>Q: "1-Minute Video" — Script Framework</h3>
+        <p style="margin-top:10px;"><strong>Structure (60 seconds):</strong></p>
+        <ol style="margin-left:20px;">
+            <li><strong>[0-10s] Hook:</strong> "Hi, I'm [name]. I'm a senior data scientist who used machine learning to build an 11-unit real estate portfolio."</li>
+            <li><strong>[10-25s] Problem:</strong> "The $20 trillion US real estate market runs on gut feeling and spreadsheets. Individual investors are making $100K+ decisions with Zillow estimates."</li>
+            <li><strong>[25-40s] Solution:</strong> "I'm building [product name] — an AI platform that gives every investor institutional-grade analytics. The same ML models I used to build my portfolio, now productized."</li>
+            <li><strong>[40-50s] Why me:</strong> "I've built production ML systems at Amazon and Uber, and I've proven this approach works with my own money in real estate."</li>
+            <li><strong>[50-60s] Ask:</strong> "I'm building the Bloomberg Terminal for real estate investors, and I'd love YC's help to scale it."</li>
+        </ol>
+    </div>
+
+    <div class="strategy-box" style="margin-top:25px;">
+        <h3>🎯 Top 10 YC Application Tips</h3>
+        <ul>
+            <li><strong>Be concise:</strong> If you can say it in 5 words instead of 50, do it. YC partners have limited time.</li>
+            <li><strong>Lead with your unfair advantage:</strong> Your first sentence should make them think "this person is uniquely qualified."</li>
+            <li><strong>Show, don't tell:</strong> "I built an 11-unit portfolio using ML" > "I'm passionate about real estate and AI"</li>
+            <li><strong>Quantify everything:</strong> Numbers are more compelling than adjectives. "X% outperformance" > "significantly better"</li>
+            <li><strong>Don't oversell the market size:</strong> YC knows RE is huge. Focus on YOUR insight about the market.</li>
+            <li><strong>Address the elephant:</strong> If you're a solo founder, address it proactively (see Founder Edge section).</li>
+            <li><strong>Apply early:</strong> Applications are reviewed on a rolling basis. Earlier = better chance of interview.</li>
+            <li><strong>Have someone review it:</strong> Get 2-3 people (ideally YC alumni or founders) to review before submitting.</li>
+            <li><strong>The video matters more than you think:</strong> It's often the deciding factor between interview/no interview.</li>
+            <li><strong>Be authentic:</strong> Don't try to sound like a "startup person." Be yourself — your unique background IS the pitch.</li>
+        </ul>
+    </div>
+</div>
+
+</div> <!-- end content -->
+
+<script>
+// Tab Navigation
+function showSection(sectionId) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(sectionId).classList.add('active');
+    event.target.classList.add('active');
+    window.scrollTo({ top: 350, behavior: 'smooth' });
+}
+
+// Countdown Timer
+function updateCountdown() {
+    const deadline = new Date('2026-05-04T20:00:00-07:00'); // May 4, 8pm PT
+    const now = new Date();
+    const diff = deadline - now;
+
+    if (diff <= 0) {
+        document.getElementById('countdown-text').textContent = 'DEADLINE PASSED';
+        document.getElementById('yc-countdown').innerHTML = '<div style="color:#e94560;">YC Summer 2026 Deadline Has Passed — Apply Anyway (Late Apps Still Reviewed)</div>';
+        return;
+    }
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    document.getElementById('countdown-text').textContent = `${days} days, ${hours} hours, ${minutes} minutes`;
+    document.getElementById('yc-days').textContent = days;
+
+    document.getElementById('yc-countdown').innerHTML = `
+        <div style="margin-bottom:10px;font-size:0.4em;font-weight:600;color:#666;">⏰ TIME UNTIL YC SUMMER 2026 DEADLINE</div>
+        <span>${days}<span class="unit">DAYS</span></span>
+        <span>${hours}<span class="unit">HOURS</span></span>
+        <span>${minutes}<span class="unit">MINS</span></span>
+        <span>${seconds}<span class="unit">SECS</span></span>
+    `;
+}
+
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+// Animate fit bars on scroll
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.style.width = entry.target.getAttribute('style').match(/width:(\d+%)/)?.[1] || '0%';
+        }
+    });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('.fit-fill').forEach(bar => observer.observe(bar));
+
+// Save checklist state to localStorage
+document.querySelectorAll('.checklist input[type="checkbox"]').forEach((checkbox, i) => {
+    const key = `checklist-${i}`;
+    checkbox.checked = localStorage.getItem(key) === 'true';
+    if (checkbox.checked) checkbox.closest('li').classList.add('completed');
+
+    checkbox.addEventListener('change', () => {
+        localStorage.setItem(key, checkbox.checked);
+        checkbox.closest('li').classList.toggle('completed', checkbox.checked);
+        updateProgress();
+    });
+});
+
+function updateProgress() {
+    const total = document.querySelectorAll('.checklist input[type="checkbox"]').length;
+    const checked = document.querySelectorAll('.checklist input[type="checkbox"]:checked').length;
+    const pct = Math.round((checked / total) * 100);
+    // Could add a progress bar here
+}
+</script>
+
+<!-- Footer -->
+<div style="background:var(--primary);color:white;padding:30px 40px;text-align:center;">
+    <p style="opacity:0.8;">🏠 RE × AI Incubator Strategy Dashboard — Built for a Technical Founder</p>
+    <p style="opacity:0.6;font-size:0.85em;margin-top:5px;">Last updated: April 2026 | Data sourced from official incubator websites</p>
+    <p style="opacity:0.6;font-size:0.85em;margin-top:5px;">Remember: The best application is a launched product. Ship fast, apply fast, iterate fast.</p>
+</div>
+
+</body>
+</html>
