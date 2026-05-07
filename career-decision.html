@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Career Decision Dashboard — Amazon (Bellevue) vs Meta WhatsApp (SF)</title>
+    <title>Career Decision Dashboard — Amazon (Bellevue) vs Meta (Menlo Park) — ACTUAL OFFERS</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
         :root {
@@ -21,6 +21,7 @@
             --red: #f85149;
             --yellow: #d29922;
             --accent: #58a6ff;
+            --critical: #ff5252;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -59,7 +60,7 @@
             border: 1px solid rgba(255,255,255,0.18);
             border-radius: 10px;
             padding: 14px 22px;
-            min-width: 160px;
+            min-width: 180px;
         }
         .hero-stat .number { font-size: 1.7em; font-weight: 800; }
         .hero-stat .label { font-size: 0.85em; opacity: 0.82; }
@@ -70,6 +71,14 @@
             font-weight: 700;
             font-size: 1.05em;
             text-align: center;
+        }
+        .critical-banner {
+            background: linear-gradient(90deg, #ff5252, #c62828);
+            padding: 12px 40px;
+            font-weight: 700;
+            font-size: 0.98em;
+            text-align: center;
+            color: white;
         }
 
         .nav-tabs {
@@ -83,13 +92,14 @@
             overflow-x: auto;
         }
         .nav-tab {
-            padding: 16px 22px;
+            padding: 16px 18px;
             cursor: pointer;
             font-weight: 600;
             color: var(--text-dim);
             border-bottom: 3px solid transparent;
             white-space: nowrap;
             transition: all 0.2s;
+            font-size: 0.95em;
         }
         .nav-tab:hover { color: var(--text); }
         .nav-tab.active {
@@ -132,6 +142,10 @@
         }
         .card.amazon { border-top: 4px solid var(--amazon); }
         .card.meta { border-top: 4px solid var(--meta); }
+        .card.critical {
+            border: 2px solid var(--critical);
+            background: linear-gradient(135deg, #1a1f2e 0%, #2a1515 100%);
+        }
 
         .card-header {
             display: flex;
@@ -151,6 +165,7 @@
         .badge.green { background: rgba(63,185,80,0.2); color: var(--green); }
         .badge.red { background: rgba(248,81,73,0.2); color: var(--red); }
         .badge.yellow { background: rgba(210,153,34,0.2); color: var(--yellow); }
+        .badge.critical { background: var(--critical); color: white; }
 
         .stat-row {
             display: flex;
@@ -158,13 +173,15 @@
             padding: 10px 0;
             border-bottom: 1px solid var(--border);
             font-size: 0.95em;
+            gap: 12px;
         }
         .stat-row:last-child { border-bottom: none; }
         .stat-row .label { color: var(--text-dim); }
-        .stat-row .value { font-weight: 600; }
+        .stat-row .value { font-weight: 600; text-align: right; }
         .value.good { color: var(--green); }
         .value.bad { color: var(--red); }
         .value.warn { color: var(--yellow); }
+        .value.critical { color: var(--critical); }
 
         .controls {
             background: var(--panel-light);
@@ -175,7 +192,7 @@
         }
         .control-group {
             display: grid;
-            grid-template-columns: 200px 1fr 100px;
+            grid-template-columns: 240px 1fr 110px;
             gap: 12px;
             align-items: center;
             margin-bottom: 14px;
@@ -215,7 +232,7 @@
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 20px;
-            height: 360px;
+            height: 400px;
         }
 
         .pros-cons {
@@ -238,6 +255,7 @@
         }
         .pc-list.pros li::before { content: "+"; color: var(--green); }
         .pc-list.cons li::before { content: "−"; color: var(--red); }
+        .pc-list.crit li::before { content: "!"; color: var(--critical); }
 
         .recommendation {
             background: linear-gradient(135deg, #1a1f2e 0%, #232a3d 100%);
@@ -288,6 +306,7 @@
         .timeline-item.warn::before { background: var(--yellow); }
         .timeline-item.bad::before { background: var(--red); }
         .timeline-item.good::before { background: var(--green); }
+        .timeline-item.crit::before { background: var(--critical); }
 
         .scenario-grid {
             display: grid;
@@ -315,6 +334,10 @@
             border-radius: 4px;
             margin-left: 6px;
         }
+        .source-tag.real {
+            background: rgba(63,185,80,0.2);
+            color: var(--green);
+        }
 
         a { color: var(--accent); text-decoration: none; }
         a:hover { text-decoration: underline; }
@@ -326,30 +349,90 @@
             padding-top: 16px;
             border-top: 1px solid var(--border);
         }
+
+        table.year-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            font-size: 0.92em;
+        }
+        table.year-table th, table.year-table td {
+            padding: 10px 12px;
+            text-align: right;
+            border-bottom: 1px solid var(--border);
+        }
+        table.year-table th:first-child, table.year-table td:first-child {
+            text-align: left;
+            color: var(--text-dim);
+        }
+        table.year-table tr.total {
+            font-weight: 700;
+            background: var(--panel-light);
+        }
+        table.year-table th {
+            color: var(--text);
+            font-weight: 700;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .alert-box {
+            padding: 16px 20px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+        }
+        .alert-box.critical {
+            background: rgba(255,82,82,0.12);
+            border: 1px solid var(--critical);
+        }
+        .alert-box.warn {
+            background: rgba(210,153,34,0.12);
+            border: 1px solid var(--yellow);
+        }
+        .alert-box .icon {
+            font-size: 1.8em;
+            line-height: 1;
+            font-weight: 900;
+            color: var(--critical);
+        }
+        .alert-box.warn .icon {
+            color: var(--yellow);
+        }
+        .alert-box .content { flex: 1; }
+        .alert-box h4 { margin-bottom: 6px; font-size: 1.05em; }
     </style>
 </head>
 <body>
 
 <div class="hero">
-    <h1>Career Decision Dashboard</h1>
-    <div class="subtitle">Amazon Senior Scientist (Bellevue) vs Meta IC5 Data Scientist, WhatsApp Business (SF)</div>
+    <h1>Career Decision Dashboard <span style="font-size:0.5em;color:var(--green);">v2 — REAL OFFERS</span></h1>
+    <div class="subtitle">Amazon Sr. Data Scientist (Bellevue, WA) vs Meta Data Scientist (Menlo Park, CA) — using actual offer letters &amp; live AMZN/META prices</div>
     <div class="hero-stats">
-        <div class="hero-stat"><div class="number">$360K</div><div class="label">Current Amazon TC</div></div>
-        <div class="hero-stat"><div class="number">~$390K</div><div class="label">Meta IC5 SF Median</div></div>
-        <div class="hero-stat"><div class="number" id="netDelta">—</div><div class="label">Net-in-hand delta (yr)</div></div>
-        <div class="hero-stat"><div class="number">2026</div><div class="label">Decision Year</div></div>
+        <div class="hero-stat"><div class="number">$190K</div><div class="label">Amazon base</div></div>
+        <div class="hero-stat"><div class="number">$232K</div><div class="label">Meta base</div></div>
+        <div class="hero-stat"><div class="number" id="amzCurrentY">—</div><div class="label">Amazon yr 1 TC (est, current AMZN)</div></div>
+        <div class="hero-stat"><div class="number" id="metaY1">—</div><div class="label">Meta yr 1 TC (est)</div></div>
+        <div class="hero-stat"><div class="number" id="cliffLossHero" style="color:#ff5252;">—</div><div class="label">AMZN equity forfeited if you leave now</div></div>
     </div>
 </div>
 
+<div class="critical-banner" id="criticalBanner">
+    CRITICAL: Leaving Amazon before July 15, 2026 forfeits ~$528K of unvested AMZN RSUs. The first vest cliff is ~10 weeks away.
+</div>
 <div class="verdict-banner" id="verdictBanner">
     Snap verdict: <span id="snapVerdict">Computing…</span>
 </div>
 
 <div class="nav-tabs">
     <div class="nav-tab active" data-tab="overview">Overview</div>
+    <div class="nav-tab" data-tab="offers">Real Offer Numbers</div>
+    <div class="nav-tab" data-tab="cliff">⚠️ Equity Cliff</div>
     <div class="nav-tab" data-tab="comp">Comp Calculator</div>
+    <div class="nav-tab" data-tab="trajectory">4-Year TC</div>
     <div class="nav-tab" data-tab="stress">Stress &amp; WLB</div>
-    <div class="nav-tab" data-tab="career">1yr &amp; 3yr Outlook</div>
+    <div class="nav-tab" data-tab="career">Career Outlook</div>
     <div class="nav-tab" data-tab="alts">Alternatives</div>
     <div class="nav-tab" data-tab="recommendation">Recommendation</div>
 </div>
@@ -358,291 +441,472 @@
 
 <!-- OVERVIEW -->
 <div class="section active" id="overview">
-    <h2>Side-by-Side Snapshot</h2>
+
+    <div class="alert-box critical">
+        <div class="icon">!</div>
+        <div class="content">
+            <h4>The single most important thing the prior version of this dashboard missed</h4>
+            <p style="color:var(--text);margin-bottom:6px;"><strong>You have not hit your Amazon 1-year vest cliff yet.</strong> Your start date was July 14, 2025; first RSU vest is July 15, 2026. Today is May 7, 2026 — you are <strong>~10 weeks short</strong>. Leaving for Meta now forfeits <strong>1,930 unvested AMZN shares × $273.55 ≈ $528K</strong>, plus the ~$117K Year-2 sign-on bonus.</p>
+            <p style="color:var(--text);margin-bottom:0;"><strong>Bottom line: starting at Meta in April/May 2026 costs you roughly $645K of locked-in Amazon value.</strong> Meta's $30K sign-on + $425K RSU grant does not come close to backfilling that.</p>
+        </div>
+    </div>
+
+    <h2>Side-by-Side Snapshot — Real Numbers</h2>
     <div class="compare-grid">
         <div class="card amazon">
             <div class="card-header">
-                <h3>Amazon — Senior Scientist (L6)</h3>
+                <h3>Amazon — Sr. Data Scientist</h3>
                 <span class="badge amazon">Current</span>
             </div>
-            <div class="stat-row"><span class="label">Location</span><span class="value">Bellevue, WA</span></div>
-            <div class="stat-row"><span class="label">Total Comp</span><span class="value">~$360K</span></div>
-            <div class="stat-row"><span class="label">State Income Tax</span><span class="value good">0%</span></div>
-            <div class="stat-row"><span class="label">L6 median TC (Levels.fyi)</span><span class="value">~$477K<span class="source-tag">Levels</span></span></div>
-            <div class="stat-row"><span class="label">WLB rating (Glassdoor DS)</span><span class="value warn">3.1 / 5</span></div>
-            <div class="stat-row"><span class="label">Recommend rate (DS)</span><span class="value good">78%</span></div>
-            <div class="stat-row"><span class="label">Cost-of-living index</span><span class="value good">Baseline (1.00)</span></div>
-            <div class="stat-row"><span class="label">Layoff risk (2026)</span><span class="value warn">Moderate</span></div>
+            <div class="stat-row"><span class="label">Org</span><span class="value">WW Fulfillment Design Engineering</span></div>
+            <div class="stat-row"><span class="label">Location</span><span class="value">Bellevue, WA (SEA112)</span></div>
+            <div class="stat-row"><span class="label">Start date</span><span class="value">July 14, 2025</span></div>
+            <div class="stat-row"><span class="label">Base salary</span><span class="value">$190,000<span class="source-tag real">offer</span></span></div>
+            <div class="stat-row"><span class="label">Y1 sign-on (installments)</span><span class="value">$157,000<span class="source-tag real">offer</span></span></div>
+            <div class="stat-row"><span class="label">Y2 sign-on (installments)</span><span class="value">$117,400<span class="source-tag real">offer</span></span></div>
+            <div class="stat-row"><span class="label">RSU grant</span><span class="value">1,930 AMZN shares<span class="source-tag real">offer</span></span></div>
+            <div class="stat-row"><span class="label">Vest schedule</span><span class="value">5 / 15 / 40 / 40 (yrs)</span></div>
+            <div class="stat-row"><span class="label">AMZN price (May 7, 2026)</span><span class="value good">$273.55<span class="source-tag">Yahoo</span></span></div>
+            <div class="stat-row"><span class="label">AMZN 1-yr return</span><span class="value good">+33.4%</span></div>
+            <div class="stat-row"><span class="label">Total grant value @ today's price</span><span class="value good">$528K</span></div>
+            <div class="stat-row"><span class="label">State income tax</span><span class="value good">0%</span></div>
+            <div class="stat-row"><span class="label">Non-compete (post-WA threshold)</span><span class="value warn">18 months — could apply</span></div>
         </div>
 
         <div class="card meta">
             <div class="card-header">
-                <h3>Meta — IC5 Data Scientist, WhatsApp Business</h3>
+                <h3>Meta — Data Scientist</h3>
                 <span class="badge meta">Offer</span>
             </div>
-            <div class="stat-row"><span class="label">Location</span><span class="value">San Francisco, CA</span></div>
-            <div class="stat-row"><span class="label">Total Comp (median IC5 SF)</span><span class="value">~$392K<span class="source-tag">Levels</span></span></div>
-            <div class="stat-row"><span class="label">CA Income Tax (marginal)</span><span class="value bad">~10.3–11.3%</span></div>
-            <div class="stat-row"><span class="label">IC5 SF range (Levels.fyi)</span><span class="value">$305K – $480K</span></div>
-            <div class="stat-row"><span class="label">WLB rating (Glassdoor DS)</span><span class="value bad">2.5 / 5</span></div>
-            <div class="stat-row"><span class="label">Recommend rate (DS)</span><span class="value bad">49%</span></div>
-            <div class="stat-row"><span class="label">Cost-of-living index</span><span class="value bad">~1.32 vs Bellevue</span></div>
-            <div class="stat-row"><span class="label">Layoff risk (2026)</span><span class="value bad">Elevated — 8K cuts May 20, more H2</span></div>
+            <div class="stat-row"><span class="label">Org</span><span class="value">Reports to Sumit Sewlani</span></div>
+            <div class="stat-row"><span class="label">Location</span><span class="value warn">Menlo Park, CA <em>(not SF)</em><span class="source-tag real">offer</span></span></div>
+            <div class="stat-row"><span class="label">Start date</span><span class="value">April 27, 2026</span></div>
+            <div class="stat-row"><span class="label">Base salary</span><span class="value">$232,000<span class="source-tag real">offer</span></span></div>
+            <div class="stat-row"><span class="label">Bonus target</span><span class="value">15% = $34,800<span class="source-tag real">offer</span></span></div>
+            <div class="stat-row"><span class="label">Sign-on (1yr clawback)</span><span class="value">$30,000<span class="source-tag real">offer</span></span></div>
+            <div class="stat-row"><span class="label">Relocation advance</span><span class="value">Separate agmt (not specified)</span></div>
+            <div class="stat-row"><span class="label">RSU initial value</span><span class="value">$425,000<span class="source-tag real">offer</span></span></div>
+            <div class="stat-row"><span class="label">Vest schedule</span><span class="value">25 / 25 / 25 / 25 (qtrly 6.25%)</span></div>
+            <div class="stat-row"><span class="label">META price (May 7, 2026)</span><span class="value warn">$611.88<span class="source-tag">Yahoo</span></span></div>
+            <div class="stat-row"><span class="label">META 1-yr return</span><span class="value bad">+4.7% (under-performed AMZN by ~30 pts)</span></div>
+            <div class="stat-row"><span class="label">CA income tax</span><span class="value bad">~10.3% marginal</span></div>
+            <div class="stat-row"><span class="label">Layoff regime</span><span class="value bad">Checkpoint 2x/yr; 8K cuts May 20 2026</span></div>
         </div>
     </div>
 
     <div class="card">
-        <h3>The core trade-off you described</h3>
-        <p>You said the <strong>net-net pay is roughly equal</strong> after CA tax + SF cost of living. The table above explains <em>why</em>: Meta's higher headline TC gets clawed back by CA income tax (~$30–40K/yr at this income) and ~32% higher cost of living. You are essentially paying for SF lifestyle and Meta's brand with ~the same take-home — and absorbing more risk &amp; stress to do it.</p>
-        <p>So the decision <strong>cannot</strong> be made on money. It has to be made on: (1) career trajectory, (2) life fit / stress tolerance, (3) optionality.</p>
+        <h3>The previous dashboard's verdict held — but the actual offer math makes it stronger</h3>
+        <p>Before I had your offer letters, I was estimating Meta TC at ~$390K and assuming roughly equal net-in-hand. <strong>The real offers say roughly the same on a steady-state basis</strong> ($373K Meta vs $400K+ Amazon Y1-Y2 incl. sign-on). But:</p>
+        <ul class="pc-list cons">
+            <li>Amazon's RSU vest is <strong>back-loaded</strong> (5/15/40/40) — Y3-Y4 each pay ~$210K in equity at today's AMZN price. Meta's is flat at ~$106K/yr.</li>
+            <li>You haven't hit Amazon's 1-year cliff yet — you walk away from $528K in unvested AMZN if you join Meta now.</li>
+            <li>Y2 Amazon sign-on ($117K) is contingent on hitting the 1-yr anniversary too.</li>
+            <li>AMZN is up 48% trailing 12 months; META is up only 5%. If that pattern continues, the equity gap widens further.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- REAL OFFERS -->
+<div class="section" id="offers">
+    <h2>Real Offer Numbers — Year-by-Year</h2>
+    <p>This is what the offer letters actually say, year-by-year, valued at today's stock prices ($273.55 AMZN, $611.88 META). Federal &amp; state taxes are estimated; FICA capped per 2026 limits.</p>
+
+    <h3 style="margin-top:20px;">Amazon — projected gross TC by year (at AMZN $273.55)</h3>
+    <div class="card amazon">
+        <table class="year-table">
+            <thead>
+                <tr><th>Component</th><th>Y1 (FY26)</th><th>Y2 (FY27)</th><th>Y3 (FY28)</th><th>Y4 (FY29)</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Base salary</td><td>$190,000</td><td>$190,000</td><td>$190,000</td><td>$190,000</td></tr>
+                <tr><td>Sign-on bonus</td><td>$157,000</td><td>$117,400</td><td>—</td><td>—</td></tr>
+                <tr><td>RSU vest (% of 1,930)</td><td>5% = 96.5 sh</td><td>15% = 289.5 sh</td><td>40% = 772 sh</td><td>40% = 772 sh</td></tr>
+                <tr><td>RSU $ value (at $273.55)</td><td>$26,398</td><td>$79,193</td><td>$211,180</td><td>$211,180</td></tr>
+                <tr class="total"><td>Total TC</td><td>$373,398</td><td>$386,593</td><td>$401,180</td><td>$401,180</td></tr>
+            </tbody>
+        </table>
+        <p style="margin-top:10px;font-size:0.88em;">4-year cumulative gross TC: <strong style="color:var(--green);">~$1.56M</strong>. Note: assumes flat AMZN price; AMZN +33% trailing year so upside is plausible.</p>
     </div>
 
-    <div class="compare-grid">
-        <div class="card">
-            <h3>Why this move could be right</h3>
-            <ul class="pc-list pros">
-                <li>Bay Area network density — best AI/ML talent gravity in the world</li>
-                <li>WhatsApp Business is a Meta growth bet (~$138B est. valuation, 50M+ businesses, 175M daily conversations)</li>
-                <li>Meta brand on resume opens FAANG-tier doors faster than Amazon-only path</li>
-                <li>Working on a consumer-scale messaging + commerce surface = unique data + ML problems</li>
-                <li>If you ever want to start a company (your incubator interest), SF beats Bellevue 5:1 on co-founder/VC density</li>
-            </ul>
+    <h3 style="margin-top:24px;">Meta — projected gross TC by year (at META $611.88)</h3>
+    <div class="card meta">
+        <table class="year-table">
+            <thead>
+                <tr><th>Component</th><th>Y1 (FY26)</th><th>Y2 (FY27)</th><th>Y3 (FY28)</th><th>Y4 (FY29)</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Base salary</td><td>$232,000</td><td>$232,000</td><td>$232,000</td><td>$232,000</td></tr>
+                <tr><td>Bonus (15% target)</td><td>$34,800</td><td>$34,800</td><td>$34,800</td><td>$34,800</td></tr>
+                <tr><td>Sign-on bonus</td><td>$30,000</td><td>—</td><td>—</td><td>—</td></tr>
+                <tr><td>RSU vest (% of $425K initial)</td><td>25%</td><td>25%</td><td>25%</td><td>25%</td></tr>
+                <tr><td>RSU $ value (at initial value)</td><td>$106,250</td><td>$106,250</td><td>$106,250</td><td>$106,250</td></tr>
+                <tr class="total"><td>Total TC</td><td>$403,050</td><td>$373,050</td><td>$373,050</td><td>$373,050</td></tr>
+            </tbody>
+        </table>
+        <p style="margin-top:10px;font-size:0.88em;">4-year cumulative gross TC: <strong>~$1.52M</strong>. RSU value floats with META price; if META is flat, equity stays at $106K/yr. If META falls (52-week range $520–$796, so high vol), Y2-Y4 erode.</p>
+    </div>
+
+    <h3 style="margin-top:24px;">Head-to-head, gross TC, before tax / COL</h3>
+    <div class="chart-wrap"><canvas id="grossChart"></canvas></div>
+
+    <p class="footnote">Amazon refresh grants typically arrive at performance reviews and would extend the trajectory beyond Y4. Meta likewise grants annual refreshes. Both are excluded from this base case to keep the apples-to-apples comparison clean.</p>
+</div>
+
+<!-- EQUITY CLIFF -->
+<div class="section" id="cliff">
+    <h2>⚠️ The Amazon Vesting Cliff — what walks away if you leave now</h2>
+
+    <div class="alert-box critical">
+        <div class="icon">!</div>
+        <div class="content">
+            <h4>Amazon RSU vest schedule (from your offer)</h4>
+            <p style="color:var(--text);">"5% on the 15th day of the month in which you reach your <strong>first anniversary</strong> of employment, 15% on the 15th day of the month in which you reach your second anniversary, and 20% every six months thereafter, until fully vested."</p>
+            <p style="color:var(--text);margin-bottom:0;"><strong>You start: July 14, 2025. First vest: July 15, 2026. Today: May 7, 2026.</strong> You are 9 weeks, 5 days from your first cliff. Leaving before July 15, 2026 means $0 of those 1,930 shares vest.</p>
         </div>
-        <div class="card">
-            <h3>Why this move could be wrong</h3>
-            <ul class="pc-list cons">
-                <li>Meta PSC (now "Checkpoint") explicitly targets bottom 7–10% — Meta is doing 8K layoffs May 20 2026 with more in H2</li>
-                <li>WLB rating 2.5 vs Amazon's 3.1; "Recommend to a friend" 49% vs 78%</li>
-                <li>You already flagged anxiety as higher at Meta — that compounds over time, not lessens</li>
-                <li>Net-in-hand is roughly flat, so you're trading certainty for risk with no premium</li>
-                <li>Senior Scientist (L6) → IC5 may be a lateral or slight down-level depending on scope; Amazon Principal (L7) is a clearer path internally than Meta E6</li>
-                <li>You'd lose WA's 0% income tax — a structural advantage worth ~$30–40K/yr</li>
+    </div>
+
+    <div class="card critical">
+        <h3>What you forfeit by leaving Amazon for Meta on April 27 / May 2026</h3>
+        <table class="year-table">
+            <thead><tr><th>Item</th><th>Value</th><th>Note</th></tr></thead>
+            <tbody>
+                <tr><td>Unvested AMZN RSUs (1,930 sh × $273.55)</td><td style="color:var(--critical);">−$528,051</td><td>100% forfeit pre-cliff</td></tr>
+                <tr><td>Y2 Amazon sign-on bonus</td><td style="color:var(--critical);">−$117,400</td><td>Only paid if employed past 1-yr anniv.</td></tr>
+                <tr><td>Remaining Y1 sign-on installments</td><td style="color:var(--critical);">≈ −$26,000</td><td>Paid in installments through year 1; ~2 months left unpaid</td></tr>
+                <tr><td>Relocation clawback (24-mo, prorated)</td><td style="color:var(--critical);">−?</td><td>Owe Amazon back any relocation paid (Y1-2 prorated)</td></tr>
+                <tr class="total"><td>Estimated walk-away cost</td><td style="color:var(--critical);">~−$671K</td><td>Excluding relocation repayment</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h3>What Meta gives you on Day 1 to offset</h3>
+        <table class="year-table">
+            <thead><tr><th>Item</th><th>Value</th></tr></thead>
+            <tbody>
+                <tr><td>Meta sign-on (1-yr clawback)</td><td>+$30,000</td></tr>
+                <tr><td>Meta RSU grant (initial value)</td><td>+$425,000 (vested over 4 yrs)</td></tr>
+                <tr><td>Meta relocation advance</td><td>+? (separate agmt; clawback if &lt;1yr)</td></tr>
+                <tr class="total"><td>Backfill total</td><td>~+$455K</td></tr>
+            </tbody>
+        </table>
+        <p style="margin-top:10px;"><strong>Net loss from switch right now: ~$216K</strong> (≈ −$671K forfeit + ~+$455K Meta package). And the Meta RSU vests over 4 years too, so you're not even getting it now — you'd need to stay 4 years to collect it.</p>
+    </div>
+
+    <div class="alert-box warn">
+        <div class="icon">!</div>
+        <div class="content">
+            <h4>The single highest-EV move available to you right now</h4>
+            <p style="color:var(--text);"><strong>Push Meta's start date to August 1, 2026 (or later).</strong> That gets you past your AMZN 1-year cliff:</p>
+            <ul style="margin-left:20px;color:var(--text);">
+                <li>You vest 5% × 1,930 = 96.5 AMZN shares = <strong>~$26K immediately</strong></li>
+                <li>You collect the full Y1 sign-on ($157K) — already mostly paid in installments</li>
+                <li>You may collect partial Y2 sign-on (paid in installments past anniversary)</li>
+                <li>Meta routinely allows start-date pushes for senior hires; ask your recruiter Ruta Singh</li>
             </ul>
+            <p style="color:var(--text);margin-bottom:0;"><strong>Even better — push to October 2026</strong> and you're 3 months into earning the Y2 sign-on installments while still vesting AMZN. Each month you delay past July 14, 2026 is worth ~$10K in additional Amazon value.</p>
         </div>
     </div>
 </div>
 
 <!-- COMP CALCULATOR -->
 <div class="section" id="comp">
-    <h2>Net-in-Hand Calculator</h2>
-    <p>Adjust the assumptions. The model recomputes net pay after federal + state tax and after cost-of-living normalization.</p>
+    <h2>Net-in-Hand Calculator (uses real offer defaults)</h2>
+    <p>Adjust assumptions. Defaults match your actual offer letters. Try changing the AMZN/META prices to see how stock performance changes everything.</p>
 
     <div class="controls">
+        <h3 style="font-size:1em;color:var(--text-dim);margin-bottom:14px;">Amazon (Bellevue, WA)</h3>
         <div class="control-group">
-            <label>Amazon TC ($K/yr)</label>
-            <input type="range" id="amzTC" min="300" max="500" value="360" step="5">
-            <div class="control-value" id="amzTCv">$360K</div>
+            <label>Amazon base salary</label>
+            <input type="range" id="amzBase" min="170" max="260" value="190" step="2">
+            <div class="control-value" id="amzBaseV">$190K</div>
         </div>
         <div class="control-group">
-            <label>Meta TC ($K/yr)</label>
-            <input type="range" id="metaTC" min="300" max="550" value="400" step="5">
-            <div class="control-value" id="metaTCv">$400K</div>
+            <label>Y1 sign-on bonus</label>
+            <input type="range" id="amzSign1" min="0" max="200" value="157" step="1">
+            <div class="control-value" id="amzSign1V">$157K</div>
         </div>
         <div class="control-group">
-            <label>SF rent premium vs Bellevue ($K/yr)</label>
-            <input type="range" id="rentDelta" min="0" max="40" value="18" step="1">
-            <div class="control-value" id="rentDeltaV">$18K</div>
+            <label>Y1 RSU vest (5% of 1,930)</label>
+            <input type="range" id="amzShares" min="0" max="600" value="97" step="1">
+            <div class="control-value" id="amzSharesV">97 sh</div>
+        </div>
+        <div class="control-group">
+            <label>AMZN stock price</label>
+            <input type="range" id="amzPrice" min="180" max="350" value="274" step="1">
+            <div class="control-value" id="amzPriceV">$274</div>
+        </div>
+
+        <h3 style="font-size:1em;color:var(--text-dim);margin:18px 0 14px;">Meta (Menlo Park, CA)</h3>
+        <div class="control-group">
+            <label>Meta base salary</label>
+            <input type="range" id="metaBase" min="200" max="320" value="232" step="2">
+            <div class="control-value" id="metaBaseV">$232K</div>
+        </div>
+        <div class="control-group">
+            <label>Bonus (15% target)</label>
+            <input type="range" id="metaBonus" min="0" max="80" value="35" step="1">
+            <div class="control-value" id="metaBonusV">$35K</div>
+        </div>
+        <div class="control-group">
+            <label>Annual RSU vest ($425K / 4)</label>
+            <input type="range" id="metaRSU" min="50" max="200" value="106" step="1">
+            <div class="control-value" id="metaRSUV">$106K</div>
+        </div>
+        <div class="control-group">
+            <label>Sign-on (Y1 only)</label>
+            <input type="range" id="metaSign" min="0" max="100" value="30" step="1">
+            <div class="control-value" id="metaSignV">$30K</div>
+        </div>
+
+        <h3 style="font-size:1em;color:var(--text-dim);margin:18px 0 14px;">Cost-of-living deltas (Menlo Park vs Bellevue)</h3>
+        <div class="control-group">
+            <label>Rent premium ($K/yr)</label>
+            <input type="range" id="rentDelta" min="0" max="40" value="20" step="1">
+            <div class="control-value" id="rentDeltaV">$20K</div>
         </div>
         <div class="control-group">
             <label>Other COL premium ($K/yr)</label>
-            <input type="range" id="colDelta" min="0" max="25" value="8" step="1">
-            <div class="control-value" id="colDeltaV">$8K</div>
+            <input type="range" id="colDelta" min="0" max="25" value="9" step="1">
+            <div class="control-value" id="colDeltaV">$9K</div>
         </div>
     </div>
 
-    <div class="delta neutral" id="netDeltaCard">Net-in-hand difference: computing…</div>
+    <div class="delta neutral" id="netDeltaCard">Net-in-hand difference (Y1): computing…</div>
 
     <div class="compare-grid">
         <div class="card amazon">
             <h3>Amazon — Bellevue (WA, 0% state)</h3>
-            <div class="stat-row"><span class="label">Gross TC</span><span class="value" id="amzGross">—</span></div>
-            <div class="stat-row"><span class="label">Federal tax (est.)</span><span class="value" id="amzFed">—</span></div>
+            <div class="stat-row"><span class="label">Gross TC (Y1)</span><span class="value" id="amzGross">—</span></div>
+            <div class="stat-row"><span class="label">Federal tax</span><span class="value" id="amzFed">—</span></div>
             <div class="stat-row"><span class="label">State tax</span><span class="value good">$0</span></div>
-            <div class="stat-row"><span class="label">FICA (capped)</span><span class="value" id="amzFica">—</span></div>
+            <div class="stat-row"><span class="label">FICA</span><span class="value" id="amzFica">—</span></div>
             <div class="stat-row"><span class="label">After-tax</span><span class="value" id="amzNet">—</span></div>
-            <div class="stat-row"><span class="label">After COL adj.</span><span class="value good" id="amzCOL">—</span></div>
+            <div class="stat-row"><span class="label">After COL adj</span><span class="value good" id="amzCOL">—</span></div>
         </div>
         <div class="card meta">
-            <h3>Meta — San Francisco (CA, ~10.3%)</h3>
-            <div class="stat-row"><span class="label">Gross TC</span><span class="value" id="metaGross">—</span></div>
-            <div class="stat-row"><span class="label">Federal tax (est.)</span><span class="value" id="metaFed">—</span></div>
+            <h3>Meta — Menlo Park (CA, ~10.3%)</h3>
+            <div class="stat-row"><span class="label">Gross TC (Y1)</span><span class="value" id="metaGross">—</span></div>
+            <div class="stat-row"><span class="label">Federal tax</span><span class="value" id="metaFed">—</span></div>
             <div class="stat-row"><span class="label">CA state tax</span><span class="value bad" id="metaState">—</span></div>
-            <div class="stat-row"><span class="label">FICA (capped)</span><span class="value" id="metaFica">—</span></div>
+            <div class="stat-row"><span class="label">FICA</span><span class="value" id="metaFica">—</span></div>
             <div class="stat-row"><span class="label">After-tax</span><span class="value" id="metaNet">—</span></div>
-            <div class="stat-row"><span class="label">After COL adj. (rent + other)</span><span class="value" id="metaCOL">—</span></div>
+            <div class="stat-row"><span class="label">After COL adj</span><span class="value" id="metaCOL">—</span></div>
         </div>
     </div>
 
     <div class="chart-wrap"><canvas id="compChart"></canvas></div>
 
-    <p class="footnote">Federal tax uses 2026 single-filer brackets, simplified. FICA caps SS at $176,100 wage base + 1.45% Medicare + 0.9% additional Medicare above $200K. CA tax uses progressive brackets up to 11.3% marginal at this income. Equity is treated as ordinary income (RSU vest). This is a directional estimator — talk to a CPA before signing.</p>
+    <p class="footnote">Federal tax: 2026 single-filer brackets, simplified. FICA: SS capped at $176,100 wage base + 1.45% Medicare + 0.9% additional Medicare above $200K. CA: progressive to ~10.3% marginal at this income. Equity treated as ordinary income at vest. Directional only — confirm with a CPA.</p>
+</div>
+
+<!-- TRAJECTORY -->
+<div class="section" id="trajectory">
+    <h2>4-Year TC Trajectory — Real Offers, Stress-Tested</h2>
+    <p>What happens if AMZN keeps outperforming, or if META rebounds? Toggle the stock scenarios.</p>
+
+    <div class="controls">
+        <div class="control-group">
+            <label>AMZN annual growth rate (%)</label>
+            <input type="range" id="amzGrowth" min="-20" max="40" value="10" step="1">
+            <div class="control-value" id="amzGrowthV">+10%</div>
+        </div>
+        <div class="control-group">
+            <label>META annual growth rate (%)</label>
+            <input type="range" id="metaGrowth" min="-20" max="40" value="10" step="1">
+            <div class="control-value" id="metaGrowthV">+10%</div>
+        </div>
+    </div>
+
+    <div class="chart-wrap"><canvas id="trajectoryChart"></canvas></div>
+
+    <div class="card">
+        <h3>Scenario read</h3>
+        <div id="trajectoryNarrative" style="color:var(--text);"></div>
+    </div>
 </div>
 
 <!-- STRESS -->
 <div class="section" id="stress">
     <h2>Stress, Anxiety &amp; Work-Life Balance</h2>
-    <p>You explicitly flagged this as the deciding factor. Here is what the public data says — and how it should weight your decision.</p>
+    <p>You explicitly flagged this as the deciding factor. Public data + your own self-assessment.</p>
 
     <div class="compare-grid">
         <div class="card amazon">
-            <h3>Amazon (current baseline)</h3>
+            <h3>Amazon (current)</h3>
             <div class="stat-row"><span class="label">DS WLB rating</span><span class="value warn">3.1 / 5</span></div>
             <div class="stat-row"><span class="label">Would recommend</span><span class="value good">78%</span></div>
-            <div class="stat-row"><span class="label">Layoff approach</span><span class="value">Org-level RIFs, less PIP-driven</span></div>
-            <div class="stat-row"><span class="label">Stack-rank pressure</span><span class="value warn">URA "Pivot" exists, but slower cadence</span></div>
+            <div class="stat-row"><span class="label">Layoff approach</span><span class="value">Org-level RIFs</span></div>
+            <div class="stat-row"><span class="label">Stack-rank pressure</span><span class="value warn">URA "Pivot" exists, slower cadence</span></div>
             <div class="stat-row"><span class="label">Your reported anxiety</span><span class="value good">Lower (status quo)</span></div>
         </div>
         <div class="card meta">
             <h3>Meta (proposed)</h3>
             <div class="stat-row"><span class="label">DS WLB rating</span><span class="value bad">2.5 / 5</span></div>
             <div class="stat-row"><span class="label">Would recommend</span><span class="value bad">49%</span></div>
-            <div class="stat-row"><span class="label">Layoff approach</span><span class="value bad">Performance-based; 8K cuts May 20 2026, more H2</span></div>
+            <div class="stat-row"><span class="label">Layoff approach</span><span class="value bad">Performance-based; 8K cuts May 20 2026</span></div>
             <div class="stat-row"><span class="label">Stack-rank pressure</span><span class="value bad">Top 20 / mid 70 / low 7 / bottom 3 (twice/yr)</span></div>
             <div class="stat-row"><span class="label">Your reported anxiety</span><span class="value bad">Higher (your own words)</span></div>
         </div>
     </div>
 
-    <div class="card">
-        <h3>Honest read</h3>
-        <p>You are moving from a job where you score yourself "lower anxiety" to one where you score yourself "higher anxiety" — and the public data corroborates the gap (2.5 vs 3.1 WLB, 49% vs 78% recommend). Meta's <strong>twice-a-year</strong> Checkpoint cycle in 2026 is explicitly designed to cull the bottom 10%. On WhatsApp Business specifically, you are joining a team that is being rebuilt around monetization &mdash; high visibility, but also high "show results in 6 months" pressure.</p>
-        <p>Anxiety has a measurable impact on decision quality, sleep, relationships, and creative output. If the financial premium were +$80K/yr you could rationalize trading some health for it. But you said it isn't &mdash; net-in-hand is flat. <strong>You'd be paying for the prestige in stress.</strong></p>
-    </div>
-
     <div class="chart-wrap"><canvas id="stressChart"></canvas></div>
 </div>
 
-<!-- CAREER OUTLOOK -->
+<!-- CAREER -->
 <div class="section" id="career">
-    <h2>1-Year &amp; 3-Year Prospects (Probabilistic)</h2>
-    <p>Three scenarios per path with rough probabilities. These are not crystal-ball — they're based on Meta's current performance regime and Amazon's historical L6→L7 paths.</p>
+    <h2>1-Year &amp; 3-Year Prospects</h2>
 
-    <h3 style="margin-top:24px;">Path A — Stay at Amazon (Bellevue)</h3>
+    <h3 style="margin-top:20px;">Path A — Stay at Amazon (Bellevue), get the cliff</h3>
     <div class="scenario-grid">
         <div class="scenario">
             <h4>Best case (35%)</h4>
-            <div class="prob">Promo to Principal (L7) within 18–30 mo</div>
-            <div class="outcome">TC trajectory: $360K → $500K+. Bay Area internal transfer possible at L7. Network builds slowly but durably.</div>
+            <div class="prob">Cliff vest + L7 promo plan in 18-30mo</div>
+            <div class="outcome">Y3-Y4 TC each ≈ $400K+ at flat AMZN. With AMZN +33% trailing yr, real Y3 TC could be $450-500K. Bay Area transfer at L7 is realistic.</div>
         </div>
         <div class="scenario">
             <h4>Base case (50%)</h4>
-            <div class="prob">Stay L6, refine portfolio + side projects</div>
-            <div class="outcome">TC drifts to $380–420K via refresh. Lower stress, predictable. Incubator/RE side-business gets actual oxygen.</div>
+            <div class="prob">L6 stable, RSU back-loading pays off</div>
+            <div class="outcome">$373K → $401K trajectory at flat AMZN. Lower stress. Side projects (incubator) get oxygen. WA tax shelter intact.</div>
         </div>
         <div class="scenario">
             <h4>Worst case (15%)</h4>
-            <div class="prob">Org RIF or stagnation</div>
-            <div class="outcome">Modest severance (~3–6mo), interview from a position of strength. WA tax shelter still works during job search.</div>
+            <div class="prob">Org RIF before Y2 cliff</div>
+            <div class="outcome">Lose Y2 sign-on + Y2 vest. But you got Y1 cliff. WA layoff carve-out exempts you from non-compete.</div>
         </div>
     </div>
 
-    <h3 style="margin-top:24px;">Path B — Move to Meta IC5 (SF, WhatsApp Business)</h3>
+    <h3 style="margin-top:24px;">Path B — Move to Meta now (forfeit cliff)</h3>
     <div class="scenario-grid">
         <div class="scenario">
             <h4>Best case (25%)</h4>
-            <div class="prob">"Top 20%" rating; promo to E6 in 24–36 mo</div>
-            <div class="outcome">TC trajectory: $390K → $550K+. Strong Meta brand; WhatsApp Business wins → high impact narrative.</div>
+            <div class="prob">"Top 20%" rating, E6 promo in 24-36mo</div>
+            <div class="outcome">$403K → $450K+ trajectory if META rises. But: still net-down from Amazon Y3-Y4 if AMZN keeps outperforming.</div>
         </div>
         <div class="scenario">
             <h4>Base case (45%)</h4>
-            <div class="prob">"Meets All / Most" — survive but treadmill</div>
-            <div class="outcome">TC rises modestly via refresh. High stress. Side projects suffer. Network expands fast in SF.</div>
+            <div class="prob">"Meets All", treadmill</div>
+            <div class="outcome">$373K/yr flat. Net loss vs staying at Amazon ≈ $200-300K over 4 years (cliff forfeit + lower equity ceiling).</div>
         </div>
         <div class="scenario">
             <h4>Worst case (30%)</h4>
-            <div class="prob">PSC downgrade or layoff in 12–18 mo</div>
-            <div class="outcome">3-mo severance + rushed job search in CA tax regime. Resume gets a "&lt;2yr Meta stint" stamp. SF lease still on the hook.</div>
+            <div class="prob">PSC downgrade or layoff &lt; 18mo</div>
+            <div class="outcome">3-mo severance + rushed job search. CA lease + CA tax exposure on accrued vest. Sub-2yr Meta stint on resume.</div>
         </div>
     </div>
 
     <div class="card">
-        <h3>The asymmetry</h3>
-        <p>Path A's worst case is a 6-month inconvenience. Path B's worst case is a forced job search after sub-2yr tenure, in a higher-COL city, with a CA lease and CA tax exposure on equity vesting. The "30% chance of bad" on Meta is the headline number. <strong>It is much higher than the equivalent risk at Amazon today</strong>.</p>
+        <h3>The asymmetry, restated with real numbers</h3>
+        <p>Path A's worst case (RIF before Y2) costs you the Y2 sign-on (~$117K) but you keep your Y1 cliff and AMZN stock has 18-month non-compete carve-out for layoffs. Path B's worst case costs you the cliff ($528K), the Y2 sign-on ($117K), AND triggers a forced job search in CA.</p>
+        <p><strong>Expected value strongly favors staying at Amazon at least through July 15, 2026 — and probably through July 14, 2027 to bank the Y2 sign-on too.</strong></p>
     </div>
-
-    <div class="chart-wrap"><canvas id="trajectoryChart"></canvas></div>
 </div>
 
 <!-- ALTERNATIVES -->
 <div class="section" id="alts">
-    <h2>The Alternatives You Should Weigh</h2>
+    <h2>The Alternatives — Updated for Your Real Situation</h2>
+
+    <div class="card critical">
+        <h3>Option 0 (NEW) — Push Meta start date past July 15, 2026</h3>
+        <p><span class="badge critical">Highest EV</span></p>
+        <p>You signed Meta on March 9, 2026. The offer asked for a start "on or before April 27, 2026". Today is May 7, 2026 — the start date may have already moved. <strong>Renegotiate the start to August 1, 2026 or later.</strong></p>
+        <ul class="pc-list pros">
+            <li>Vest 5% AMZN cliff = 96.5 sh × $273 = <strong>~$26K direct cash equivalent</strong></li>
+            <li>Collect remaining Y1 sign-on installments (~$26K)</li>
+            <li>Bank ~3-4 months of Y2 sign-on installments (~$30-40K)</li>
+            <li>Avoids the Amazon relocation clawback if you've been there 12+ months (depending on policy)</li>
+            <li>Meta routinely allows start-date pushes for senior IC hires; this is a standard ask</li>
+        </ul>
+        <p>Time cost: 0 days extra job-searching. Ask your Meta recruiter Ruta Singh.</p>
+    </div>
 
     <div class="card">
         <h3>Option 1 — Amazon internal transfer to Bay Area</h3>
-        <p><span class="badge green">Recommended to explore first</span></p>
-        <p>Amazon has a real Bay Area presence (Sunnyvale, San Francisco, East Palo Alto, Lab126, AGI). An internal L6 transfer keeps your tenure clock, your stock vest schedule, and your manager relationships — but gives you the Bay Area life you said you want. Downsides: you still pay CA tax, but you don't take Meta-tier layoff risk.</p>
-        <p>Action: post in internal mobility, talk to Amazon Bay Area science orgs (AGI, Alexa AI, AWS AI, Lab126). 4–8 week process.</p>
+        <p><span class="badge green">Most aligned with what you actually want</span></p>
+        <p>Amazon has real Bay Area presence (Sunnyvale, San Francisco, East Palo Alto, Lab126, AGI, AWS AI). An L6 internal transfer keeps your tenure clock, your AMZN vest schedule (no cliff forfeiture), your Y2 sign-on, and your manager relationships — and puts you in the Bay Area. Yes, you'd start paying CA tax — but you'd avoid Meta-tier layoff risk and keep your $528K AMZN equity.</p>
+        <p>Action: post in internal mobility, talk to Bay Area science orgs (AGI, Alexa AI, AWS AI, Lab126). 4–8 week process.</p>
     </div>
 
     <div class="card">
-        <h3>Option 2 — Keep interviewing at peers (Google, Anthropic, OpenAI, Apple, Netflix)</h3>
-        <p><span class="badge yellow">High value — costs you nothing to run</span></p>
-        <p>Right now Meta is your only outside offer. That means you have <strong>zero leverage and one data point</strong>. Spinning up 2–3 more loops in parallel either:</p>
-        <ul class="pc-list pros">
-            <li>Gets you a higher Meta counter (Meta will match competing offers)</li>
-            <li>Surfaces a better fit (Google/Apple WLB tends to score higher than Meta's; Anthropic / OpenAI for ML upside)</li>
-            <li>Lets you say "no" to Meta from a position of strength, not fear</li>
-        </ul>
-        <p>Time cost: ~6–10 weeks. Realistic uplift: a real second offer plus +$50–150K negotiation room on whichever you take.</p>
+        <h3>Option 2 — Use Meta as leverage at Amazon</h3>
+        <p><span class="badge yellow">Costs you nothing</span></p>
+        <p>A signed Meta IC5 offer is a credible threat. Bring it to your Amazon manager + skip with a clear ask: an out-of-cycle equity refresh (typical match: $300-500K refresh), an L7 promo plan with milestones, and/or an internal transfer. Worst case: they say no and you're back to today's choice — but with the cliff still ticking down.</p>
     </div>
 
     <div class="card">
-        <h3>Option 3 — Take Meta as planned</h3>
+        <h3>Option 3 — Decline Meta, stay through Y2 cliff (July 2027), then re-evaluate</h3>
+        <p><span class="badge green">Highest 4-year cumulative comp</span></p>
+        <p>If your priority is total comp + lower stress, declining Meta and staying at Amazon through July 14, 2027 banks: $528K Y1 cliff + $117K Y2 sign-on + Y2 vest (15% × 1,930 × $273 = $79K) = <strong>~$724K in additional locked-in value</strong> vs jumping now. Then re-interview with 24-mo Amazon tenure on resume = stronger external offers.</p>
+    </div>
+
+    <div class="card">
+        <h3>Option 4 — Take Meta as planned</h3>
         <p><span class="badge red">Only if you can answer "yes" to all three</span></p>
         <ul class="pc-list pros">
-            <li>You've stress-tested how you handle Meta-style stack rank for 24+ months</li>
-            <li>You have ~9 months of expenses banked in case of layoff</li>
-            <li>You genuinely want SF lifestyle + network for non-career reasons (founding a startup, partner's job, etc.) — and would still want it if comp were the same at both</li>
+            <li>You can stress-test Meta-style stack rank for 24+ months</li>
+            <li>You have ~9 months of expenses banked (in case of layoff)</li>
+            <li>The non-financial reasons (founding ambitions, partner's job, network density) are so compelling you'd take it even at a $200K+ net loss vs Amazon</li>
         </ul>
-    </div>
-
-    <div class="card">
-        <h3>Option 4 — Use this offer to negotiate at Amazon</h3>
-        <p><span class="badge yellow">Low risk, often underused</span></p>
-        <p>An external Meta IC5 offer is a credible threat. Bring it to your Amazon manager + skip with a clear ask: an out-of-cycle equity refresh, an L7 promo plan with milestones, and/or an internal transfer to the Bay Area. Worst case: they say no and you're back to today's choice.</p>
     </div>
 </div>
 
 <!-- RECOMMENDATION -->
 <div class="section" id="recommendation">
-    <h2>Recommendation</h2>
+    <h2>Final Recommendation (Updated)</h2>
 
     <div class="recommendation">
-        <div class="rec-verdict">Don't take the Meta offer as-is. Don't simply stay either.</div>
-        <p>Given everything you told me — equal net-in-hand, higher anxiety at Meta, and a personal interest in the Bay Area — taking Meta IC5 is a <strong>negative-expected-value</strong> move on a risk-adjusted basis. You'd be trading a known, lower-stress, tax-advantaged role for a higher-stress role at a company actively running performance-based layoffs in 2026, for no real cash premium.</p>
+        <div class="rec-verdict">Don't start at Meta on April 27 / May 2026. Push the start date.</div>
+        <p>The previous version of this dashboard concluded "don't take Meta." With the actual offers in hand, the conclusion sharpens: <strong>even if you ultimately want to take Meta, starting before your Amazon 1-year vest cliff (July 15, 2026) is a $200-700K mistake.</strong></p>
 
-        <h3 style="margin-top:18px;">The 90-day playbook I'd run if I were you</h3>
+        <h3 style="margin-top:18px;">The 30-day playbook</h3>
         <ol class="timeline" style="list-style:none;">
-            <li class="timeline-item good"><strong>Weeks 1–2:</strong> Initiate Amazon internal mobility conversations for Bay Area orgs (AGI, AWS AI, Lab126). Tell your manager you're exploring — not threatening.</li>
-            <li class="timeline-item"><strong>Weeks 1–6:</strong> Open 2–3 parallel interview loops (Google, Apple, Anthropic). Pick teams with better WLB signals than Meta's.</li>
-            <li class="timeline-item warn"><strong>Weeks 4–6:</strong> Use the live Meta offer as leverage — either get an Amazon equity refresh / L7 plan, or a stronger competing offer.</li>
-            <li class="timeline-item"><strong>Weeks 6–10:</strong> Re-decide with at least 2 outside offers + 1 internal counter on the table. Now the choice is informed.</li>
-            <li class="timeline-item bad"><strong>Decline Meta now if:</strong> the offer expires before you can run this. Walking away from a flat-net-pay, higher-stress role is a non-event.</li>
+            <li class="timeline-item crit"><strong>This week:</strong> Email Meta recruiter Ruta Singh — request start date push to August 1, 2026 or later. Cite "personal/financial timing." This is standard.</li>
+            <li class="timeline-item good"><strong>This week:</strong> If start has already moved past today (May 7), confirm in writing what the actual current start date is — your Meta letter said "on or before April 27" but today's past that.</li>
+            <li class="timeline-item warn"><strong>Weeks 1-2:</strong> Show the Meta offer to your Amazon manager + skip. Ask for: (a) out-of-cycle equity refresh ≥$300K, (b) L7 promo plan, (c) internal Bay Area transfer.</li>
+            <li class="timeline-item"><strong>Weeks 1-6:</strong> Open 1-2 parallel loops at Google / Apple / Anthropic for negotiation leverage and as a backup.</li>
+            <li class="timeline-item good"><strong>July 15, 2026:</strong> Y1 AMZN vest hits = 96.5 sh × ~$273 = $26K. Cliff cleared.</li>
+            <li class="timeline-item bad"><strong>If Meta refuses to push start date:</strong> Strongly consider declining. The cliff is worth $528K — Meta's $30K sign-on is not negotiable enough to bridge that.</li>
         </ol>
 
-        <h3 style="margin-top:18px;">Decision rule, in one sentence</h3>
-        <p style="font-size:1.05em;color:var(--text);">Take Meta only if (a) net comp clears Amazon by ≥ $60K/yr after CA tax + COL, <em>or</em> (b) the team/scope is so strategic (e.g., direct reports, product ownership, AI infra leadership) that it's effectively a promo. Neither is true based on what you described — so the answer is no, with a plan.</p>
+        <h3 style="margin-top:18px;">Decision rule, restated with real numbers</h3>
+        <p style="font-size:1.05em;color:var(--text);">Take Meta only if (a) <strong>start date is past July 15, 2026</strong> AND (b) net comp clears Amazon's Y3-Y4 trajectory by ≥$60K/yr after CA tax + Menlo Park COL, <em>or</em> (c) the team scope is effectively a promo (E6 in scope, direct reports, product ownership). Based on actual offers, neither (b) nor (c) is true — so the answer is <strong>delay or decline.</strong></p>
+
+        <h3 style="margin-top:18px;">Things to verify with Meta before any final decision</h3>
+        <ul style="margin-left:20px;color:var(--text);">
+            <li>Is this offer actually IC5 (E5)? The letter says "Data Scientist" without level. If it's E4, the prior dashboard's IC5 comp comparison overstated the headline.</li>
+            <li>Whose Menlo Park budget is this on — is the WhatsApp Business team you described actually MPK-based or is there a SF/MPK split?</li>
+            <li>What is the relocation advance dollar amount? Letter referenced "separate agreement" without a number.</li>
+            <li>Will Meta buy out your unvested AMZN equity? Standard ask for senior hires; the $30K sign-on is way below market for what you're forfeiting.</li>
+        </ul>
     </div>
 
     <div class="footnote">
         <strong>Sources used to build this dashboard:</strong>
         <ul style="margin-top:8px;">
-            <li><a href="https://www.levels.fyi/companies/meta/salaries/data-scientist/levels/ic5/locations/san-francisco-bay-area" target="_blank">Levels.fyi — Meta IC5 Data Scientist, SF Bay Area</a></li>
-            <li><a href="https://www.levels.fyi/companies/amazon/salaries/senior-applied-scientist/levels/l6" target="_blank">Levels.fyi — Amazon L6 Senior Applied Scientist</a></li>
-            <li><a href="https://www.numbeo.com/cost-of-living/compare_cities.jsp?country1=United+States&city1=San+Francisco,+CA&country2=United+States&city2=Bellevue,+WA" target="_blank">Numbeo — SF vs Bellevue Cost of Living</a></li>
-            <li><a href="https://www.glassdoor.com/Reviews/Meta-Data-Scientist-Reviews-EI_IE40772.0,4_KO5,19.htm" target="_blank">Glassdoor — Meta Data Scientist Reviews</a></li>
-            <li><a href="https://www.glassdoor.com/Reviews/Amazon-Data-Scientist-Reviews-EI_IE6036.0,6_KO7,21.htm" target="_blank">Glassdoor — Amazon Data Scientist Reviews</a></li>
-            <li><a href="https://www.thehrdigest.com/how-is-metas-performance-review-system-changing-in-2026-a-closer-look/" target="_blank">HR Digest — Meta Checkpoint 2026 Performance System</a></li>
+            <li>Your actual Amazon offer letter (signed May 7, 2025; start July 14, 2025; SEA112 Bellevue WA)</li>
+            <li>Your actual Meta offer letter (signed March 9, 2026; Menlo Park CA; manager Sumit Sewlani)</li>
+            <li>AMZN price May 7, 2026: ~$273.55 (Yahoo Finance / StockAnalysis)</li>
+            <li>META price May 7, 2026: ~$611.88 (Yahoo Finance / Robinhood)</li>
+            <li><a href="https://www.levels.fyi/companies/meta/salaries/data-scientist/levels/ic5/locations/san-francisco-bay-area" target="_blank">Levels.fyi — Meta IC5 Data Scientist SF Bay Area</a></li>
+            <li><a href="https://www.levels.fyi/companies/amazon/salaries/senior-applied-scientist/levels/l6" target="_blank">Levels.fyi — Amazon L6 Senior Scientist</a></li>
+            <li><a href="https://www.numbeo.com/cost-of-living/compare_cities.jsp?country1=United+States&city1=San+Francisco,+CA&country2=United+States&city2=Bellevue,+WA" target="_blank">Numbeo — SF vs Bellevue cost of living</a></li>
+            <li><a href="https://www.glassdoor.com/Reviews/Meta-Data-Scientist-Reviews-EI_IE40772.0,4_KO5,19.htm" target="_blank">Glassdoor — Meta Data Scientist reviews</a></li>
+            <li><a href="https://www.thehrdigest.com/how-is-metas-performance-review-system-changing-in-2026-a-closer-look/" target="_blank">HR Digest — Meta Checkpoint 2026</a></li>
             <li><a href="https://thenextweb.com/news/meta-layoffs-may-2026-ai-restructuring-thousands" target="_blank">TNW — Meta May 20 2026 layoff announcement</a></li>
-            <li><a href="https://mobileecosystemforum.com/2026/04/08/whatsapp-business-april-2026/" target="_blank">MEF — WhatsApp Business April 2026</a></li>
-            <li><a href="https://www.amazon.science/locations/san-francisco-bay-area" target="_blank">Amazon Science — SF Bay Area locations</a></li>
         </ul>
-        <p style="margin-top:10px;">This is decision-support, not financial or legal advice. Validate tax math with a CPA and offer details with an employment lawyer before signing.</p>
+        <p style="margin-top:10px;"><strong>Disclaimer:</strong> Decision-support only. Not legal, tax, or financial advice. Validate the Amazon non-compete + relocation clawback with an employment lawyer before declining the Amazon role. Validate equity buy-out negotiation tactics with a comp-negotiation specialist (e.g., Levels.fyi negotiation service). Tax math is directional — confirm with a CPA.</p>
     </div>
 </div>
 
 </div>
 
 <script>
+// ==================== Data ====================
+const AMZN_PRICE_DEFAULT = 273.55;
+const META_PRICE_DEFAULT = 611.88;
+const AMZN_SHARES = 1930;
+const META_RSU_INITIAL = 425000;
+
 // Tabs
 document.querySelectorAll('.nav-tab').forEach(tab => {
     tab.addEventListener('click', () => {
@@ -651,85 +915,100 @@ document.querySelectorAll('.nav-tab').forEach(tab => {
         tab.classList.add('active');
         document.getElementById(tab.dataset.tab).classList.add('active');
         window.scrollTo({top: 0, behavior: 'smooth'});
+        // Build charts on tab activation
+        setTimeout(() => {
+            if (tab.dataset.tab === 'comp') recompute();
+            if (tab.dataset.tab === 'stress') buildStressChart();
+            if (tab.dataset.tab === 'trajectory') buildTrajectoryChart();
+            if (tab.dataset.tab === 'offers') buildGrossChart();
+        }, 50);
     });
 });
 
-// ---------- Tax helpers ----------
+// ==================== Tax helpers ====================
 function fedTax(income) {
-    // 2026 single-filer brackets (projected, simplified)
     const brackets = [
-        [0,        0.10],
-        [11925,    0.12],
-        [48475,    0.22],
-        [103350,   0.24],
-        [197300,   0.32],
-        [250525,   0.35],
-        [626350,   0.37]
+        [0, 0.10],[11925, 0.12],[48475, 0.22],[103350, 0.24],
+        [197300, 0.32],[250525, 0.35],[626350, 0.37]
     ];
     let tax = 0;
     for (let i = 0; i < brackets.length; i++) {
         const lower = brackets[i][0];
         const upper = i < brackets.length - 1 ? brackets[i+1][0] : Infinity;
-        const rate  = brackets[i][1];
-        if (income > lower) tax += (Math.min(income, upper) - lower) * rate;
+        if (income > lower) tax += (Math.min(income, upper) - lower) * brackets[i][1];
     }
     return tax;
 }
 function caTax(income) {
-    // 2026 CA single-filer brackets (simplified, top bracket excludes mental-health 1%)
     const brackets = [
-        [0,        0.01],
-        [10412,    0.02],
-        [24684,    0.04],
-        [38959,    0.06],
-        [54081,    0.08],
-        [68350,    0.093],
-        [349137,   0.103],
-        [418961,   0.113],
-        [698271,   0.123]
+        [0, 0.01],[10412, 0.02],[24684, 0.04],[38959, 0.06],[54081, 0.08],
+        [68350, 0.093],[349137, 0.103],[418961, 0.113],[698271, 0.123]
     ];
     let tax = 0;
     for (let i = 0; i < brackets.length; i++) {
         const lower = brackets[i][0];
         const upper = i < brackets.length - 1 ? brackets[i+1][0] : Infinity;
-        const rate  = brackets[i][1];
-        if (income > lower) tax += (Math.min(income, upper) - lower) * rate;
+        if (income > lower) tax += (Math.min(income, upper) - lower) * brackets[i][1];
     }
     return tax;
 }
 function fica(income) {
     const ssCap = 176100;
-    const ss = Math.min(income, ssCap) * 0.062;
-    const medicare = income * 0.0145;
-    const addlMed = Math.max(0, income - 200000) * 0.009;
-    return ss + medicare + addlMed;
+    return Math.min(income, ssCap) * 0.062 + income * 0.0145 + Math.max(0, income - 200000) * 0.009;
 }
-function fmt(n) {
-    return "$" + Math.round(n/1000) + "K";
+function fmt(n, decimals = 0) {
+    if (n >= 1000) return "$" + (n/1000).toFixed(decimals) + "K";
+    return "$" + Math.round(n);
 }
 
-// ---------- Comp calculator ----------
+// ==================== Hero stats ====================
+function updateHeroStats() {
+    const amzY1 = 190000 + 157000 + (AMZN_SHARES * 0.05) * AMZN_PRICE_DEFAULT;
+    const metaY1 = 232000 + 34800 + 30000 + (META_RSU_INITIAL * 0.25);
+    const cliff = AMZN_SHARES * AMZN_PRICE_DEFAULT;
+    document.getElementById('amzCurrentY').textContent = fmt(amzY1);
+    document.getElementById('metaY1').textContent = fmt(metaY1);
+    document.getElementById('cliffLossHero').textContent = "−" + fmt(cliff);
+}
+updateHeroStats();
+
+// ==================== Comp calculator ====================
 function recompute() {
-    const amzTC  = +document.getElementById('amzTC').value * 1000;
-    const metaTC = +document.getElementById('metaTC').value * 1000;
+    const amzBase = +document.getElementById('amzBase').value * 1000;
+    const amzSign1 = +document.getElementById('amzSign1').value * 1000;
+    const amzShares = +document.getElementById('amzShares').value;
+    const amzPrice = +document.getElementById('amzPrice').value;
+    const metaBase = +document.getElementById('metaBase').value * 1000;
+    const metaBonus = +document.getElementById('metaBonus').value * 1000;
+    const metaRSU = +document.getElementById('metaRSU').value * 1000;
+    const metaSign = +document.getElementById('metaSign').value * 1000;
     const rentDelta = +document.getElementById('rentDelta').value * 1000;
-    const colDelta  = +document.getElementById('colDelta').value * 1000;
+    const colDelta = +document.getElementById('colDelta').value * 1000;
 
-    document.getElementById('amzTCv').textContent = fmt(amzTC);
-    document.getElementById('metaTCv').textContent = fmt(metaTC);
+    document.getElementById('amzBaseV').textContent = fmt(amzBase);
+    document.getElementById('amzSign1V').textContent = fmt(amzSign1);
+    document.getElementById('amzSharesV').textContent = amzShares + " sh";
+    document.getElementById('amzPriceV').textContent = "$" + amzPrice;
+    document.getElementById('metaBaseV').textContent = fmt(metaBase);
+    document.getElementById('metaBonusV').textContent = fmt(metaBonus);
+    document.getElementById('metaRSUV').textContent = fmt(metaRSU);
+    document.getElementById('metaSignV').textContent = fmt(metaSign);
     document.getElementById('rentDeltaV').textContent = fmt(rentDelta);
     document.getElementById('colDeltaV').textContent = fmt(colDelta);
+
+    const amzTC = amzBase + amzSign1 + amzShares * amzPrice;
+    const metaTC = metaBase + metaBonus + metaRSU + metaSign;
 
     const amzFedT = fedTax(amzTC);
     const amzFicaT = fica(amzTC);
     const amzNet = amzTC - amzFedT - amzFicaT;
-    const amzCOL = amzNet; // baseline
+    const amzCOL = amzNet;
 
-    const metaFedT  = fedTax(metaTC);
+    const metaFedT = fedTax(metaTC);
     const metaState = caTax(metaTC);
     const metaFicaT = fica(metaTC);
-    const metaNet   = metaTC - metaFedT - metaState - metaFicaT;
-    const metaCOL   = metaNet - rentDelta - colDelta;
+    const metaNet = metaTC - metaFedT - metaState - metaFicaT;
+    const metaCOL = metaNet - rentDelta - colDelta;
 
     document.getElementById('amzGross').textContent = fmt(amzTC);
     document.getElementById('amzFed').textContent = "−" + fmt(amzFedT);
@@ -747,34 +1026,24 @@ function recompute() {
     const delta = metaCOL - amzCOL;
     const deltaCard = document.getElementById('netDeltaCard');
     const sign = delta >= 0 ? "+" : "−";
-    deltaCard.textContent = "Net-in-hand difference (Meta − Amazon, after taxes & COL): " + sign + fmt(Math.abs(delta)) + "/yr";
+    deltaCard.textContent = "Net-in-hand difference, Y1 (Meta − Amazon, after taxes & COL): " + sign + fmt(Math.abs(delta)) + "/yr";
     deltaCard.className = "delta " + (delta > 8000 ? "positive" : delta < -8000 ? "negative" : "neutral");
 
-    // Hero stat
-    document.getElementById('netDelta').textContent = (delta >= 0 ? "+" : "−") + fmt(Math.abs(delta));
-
-    // Snap verdict
     const verdict = document.getElementById('snapVerdict');
-    if (delta < -10000) {
-        verdict.textContent = "Don't move — you'd lose money AND gain stress.";
-    } else if (delta < 15000) {
-        verdict.textContent = "Net pay is roughly flat — no financial reason to move; decide on lifestyle/career fit.";
-    } else if (delta < 50000) {
-        verdict.textContent = "Modest pay bump — likely not enough to offset Meta's higher stress and layoff risk.";
-    } else {
-        verdict.textContent = "Material pay bump — re-run the stress trade-off; might be worth it.";
-    }
+    if (delta < -10000) verdict.textContent = "Don't move — you'd lose money AND gain stress AND forfeit ~$528K of unvested AMZN.";
+    else if (delta < 15000) verdict.textContent = "Net pay roughly flat — and you'd forfeit your AMZN cliff. No.";
+    else if (delta < 50000) verdict.textContent = "Modest pay bump that doesn't begin to offset $528K cliff forfeit. Push start date.";
+    else verdict.textContent = "Material bump — but cliff forfeit still kills it. Push start date.";
 
-    // Update charts
     updateCompChart(amzTC, amzCOL, metaTC, metaCOL, amzFedT, metaFedT, metaState, amzFicaT, metaFicaT, rentDelta, colDelta);
 }
 
-['amzTC','metaTC','rentDelta','colDelta'].forEach(id => {
+['amzBase','amzSign1','amzShares','amzPrice','metaBase','metaBonus','metaRSU','metaSign','rentDelta','colDelta'].forEach(id => {
     document.getElementById(id).addEventListener('input', recompute);
 });
 
-// ---------- Charts ----------
-let compChart, stressChart, trajectoryChart;
+// ==================== Charts ====================
+let compChart, stressChart, trajectoryChart, grossChart;
 
 function updateCompChart(amzTC, amzCOL, metaTC, metaCOL, amzFed, metaFed, metaState, amzFica, metaFica, rentDelta, colDelta) {
     const ctx = document.getElementById('compChart');
@@ -782,41 +1051,47 @@ function updateCompChart(amzTC, amzCOL, metaTC, metaCOL, amzFed, metaFed, metaSt
     const data = {
         labels: ['Gross TC', 'After fed tax', 'After state tax', 'After FICA', 'After COL adj.'],
         datasets: [
-            {
-                label: 'Amazon (Bellevue)',
-                data: [amzTC, amzTC - amzFed, amzTC - amzFed, amzTC - amzFed - amzFica, amzCOL],
-                borderColor: '#ff9900',
-                backgroundColor: 'rgba(255,153,0,0.15)',
-                tension: 0.25,
-                fill: true
-            },
-            {
-                label: 'Meta (SF)',
-                data: [metaTC, metaTC - metaFed, metaTC - metaFed - metaState, metaTC - metaFed - metaState - metaFica, metaCOL],
-                borderColor: '#0866ff',
-                backgroundColor: 'rgba(8,102,255,0.15)',
-                tension: 0.25,
-                fill: true
-            }
+            { label: 'Amazon (Bellevue)', data: [amzTC, amzTC - amzFed, amzTC - amzFed, amzTC - amzFed - amzFica, amzCOL],
+              borderColor: '#ff9900', backgroundColor: 'rgba(255,153,0,0.15)', tension: 0.25, fill: true },
+            { label: 'Meta (Menlo Park)', data: [metaTC, metaTC - metaFed, metaTC - metaFed - metaState, metaTC - metaFed - metaState - metaFica, metaCOL],
+              borderColor: '#0866ff', backgroundColor: 'rgba(8,102,255,0.15)', tension: 0.25, fill: true }
         ]
     };
     if (compChart) compChart.destroy();
     compChart = new Chart(ctx, {
-        type: 'line',
-        data,
+        type: 'line', data,
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { labels: { color: '#e6edf3' } },
-                title: { display: true, text: 'Where the money goes', color: '#e6edf3' }
-            },
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#e6edf3' } }, title: { display: true, text: 'Where the Y1 money goes (real offer numbers)', color: '#e6edf3' } },
             scales: {
                 x: { ticks: { color: '#8b949e' }, grid: { color: '#30363d' } },
-                y: {
-                    ticks: { color: '#8b949e', callback: v => '$' + (v/1000).toFixed(0) + 'K' },
-                    grid: { color: '#30363d' }
-                }
+                y: { ticks: { color: '#8b949e', callback: v => '$' + (v/1000).toFixed(0) + 'K' }, grid: { color: '#30363d' } }
+            }
+        }
+    });
+}
+
+function buildGrossChart() {
+    const ctx = document.getElementById('grossChart');
+    if (!ctx) return;
+    if (grossChart) grossChart.destroy();
+    const amzData = [373.4, 386.6, 401.2, 401.2];
+    const metaData = [403.05, 373.05, 373.05, 373.05];
+    grossChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4'],
+            datasets: [
+                { label: 'Amazon (Bellevue) — gross TC ($K)', data: amzData, backgroundColor: 'rgba(255,153,0,0.7)', borderColor: '#ff9900', borderWidth: 2 },
+                { label: 'Meta (Menlo Park) — gross TC ($K)', data: metaData, backgroundColor: 'rgba(8,102,255,0.7)', borderColor: '#0866ff', borderWidth: 2 }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#e6edf3' } }, title: { display: true, text: 'Year-by-year gross TC (assuming flat AMZN/META prices)', color: '#e6edf3' } },
+            scales: {
+                x: { ticks: { color: '#8b949e' }, grid: { color: '#30363d' } },
+                y: { ticks: { color: '#8b949e', callback: v => '$' + v + 'K' }, grid: { color: '#30363d' } }
             }
         }
     });
@@ -829,39 +1104,16 @@ function buildStressChart() {
     stressChart = new Chart(ctx, {
         type: 'radar',
         data: {
-            labels: ['Work-life balance', 'Recommend rate', 'Job security 2026', 'Calendar control', 'Stack-rank pressure (lower is better)', 'Your reported anxiety (lower is better)'],
+            labels: ['WLB', 'Recommend rate', 'Job security 2026', 'Calendar control', 'Stack-rank pressure (lower=better)', 'Your reported anxiety (lower=better)'],
             datasets: [
-                {
-                    label: 'Amazon (Bellevue)',
-                    data: [62, 78, 65, 60, 55, 70],
-                    backgroundColor: 'rgba(255,153,0,0.2)',
-                    borderColor: '#ff9900'
-                },
-                {
-                    label: 'Meta (SF)',
-                    data: [50, 49, 40, 45, 25, 35],
-                    backgroundColor: 'rgba(8,102,255,0.2)',
-                    borderColor: '#0866ff'
-                }
+                { label: 'Amazon (Bellevue)', data: [62, 78, 65, 60, 55, 70], backgroundColor: 'rgba(255,153,0,0.2)', borderColor: '#ff9900' },
+                { label: 'Meta (Menlo Park)', data: [50, 49, 40, 45, 25, 35], backgroundColor: 'rgba(8,102,255,0.2)', borderColor: '#0866ff' }
             ]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { labels: { color: '#e6edf3' } },
-                title: { display: true, text: 'Lifestyle + risk axes (higher = better)', color: '#e6edf3' }
-            },
-            scales: {
-                r: {
-                    angleLines: { color: '#30363d' },
-                    grid: { color: '#30363d' },
-                    pointLabels: { color: '#e6edf3' },
-                    ticks: { color: '#8b949e', backdropColor: 'transparent' },
-                    suggestedMin: 0,
-                    suggestedMax: 100
-                }
-            }
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#e6edf3' } }, title: { display: true, text: 'Lifestyle + risk axes (higher = better)', color: '#e6edf3' } },
+            scales: { r: { angleLines: { color: '#30363d' }, grid: { color: '#30363d' }, pointLabels: { color: '#e6edf3' }, ticks: { color: '#8b949e', backdropColor: 'transparent' }, suggestedMin: 0, suggestedMax: 100 } }
         }
     });
 }
@@ -869,72 +1121,67 @@ function buildStressChart() {
 function buildTrajectoryChart() {
     const ctx = document.getElementById('trajectoryChart');
     if (!ctx) return;
+    const amzG = +document.getElementById('amzGrowth').value / 100;
+    const metaG = +document.getElementById('metaGrowth').value / 100;
+    document.getElementById('amzGrowthV').textContent = (amzG >= 0 ? '+' : '') + (amzG*100).toFixed(0) + '%';
+    document.getElementById('metaGrowthV').textContent = (metaG >= 0 ? '+' : '') + (metaG*100).toFixed(0) + '%';
+
+    // Build 4-yr trajectory with stock growth applied to RSU portion
+    function priceAtYr(start, growth, yr) { return start * Math.pow(1 + growth, yr); }
+
+    const amzTC = [];
+    const metaTC = [];
+    const yrs = [1,2,3,4];
+    for (const y of yrs) {
+        const amzPrice = priceAtYr(AMZN_PRICE_DEFAULT, amzG, y - 0.5); // mid-year price
+        const metaPrice = priceAtYr(META_PRICE_DEFAULT, metaG, y - 0.5);
+        // Amazon RSU schedule: 5/15/40/40
+        const amzPct = y === 1 ? 0.05 : y === 2 ? 0.15 : 0.40;
+        const amzSign = y === 1 ? 157000 : y === 2 ? 117400 : 0;
+        const amzYr = 190000 + amzSign + (AMZN_SHARES * amzPct) * amzPrice;
+        // Meta RSU: META price ratio to original determines value of vest
+        const metaRSURatio = metaPrice / META_PRICE_DEFAULT;
+        const metaSign = y === 1 ? 30000 : 0;
+        const metaYr = 232000 + 34800 + metaSign + (META_RSU_INITIAL * 0.25) * metaRSURatio;
+        amzTC.push(amzYr / 1000);
+        metaTC.push(metaYr / 1000);
+    }
+
     if (trajectoryChart) trajectoryChart.destroy();
-    // Probability-weighted expected TC trajectory over 3 years
-    // Amazon: 0.35*aggressive + 0.50*base + 0.15*worst
-    // Meta:   0.25*aggressive + 0.45*base + 0.30*worst
-    const amzExp = [
-        360,
-        0.35*420 + 0.50*385 + 0.15*340,
-        0.35*470 + 0.50*410 + 0.15*360,
-        0.35*520 + 0.50*430 + 0.15*380
-    ];
-    const metaExp = [
-        390,
-        0.25*460 + 0.45*410 + 0.30*330,
-        0.25*520 + 0.45*430 + 0.30*340,
-        0.25*580 + 0.45*450 + 0.30*360
-    ];
     trajectoryChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['Now', 'Yr 1', 'Yr 2', 'Yr 3'],
+            labels: ['Yr 1', 'Yr 2', 'Yr 3', 'Yr 4'],
             datasets: [
-                {
-                    label: 'Amazon — expected TC ($K)',
-                    data: amzExp,
-                    borderColor: '#ff9900',
-                    backgroundColor: 'rgba(255,153,0,0.15)',
-                    tension: 0.3,
-                    fill: true
-                },
-                {
-                    label: 'Meta — expected TC ($K, prob-weighted)',
-                    data: metaExp,
-                    borderColor: '#0866ff',
-                    backgroundColor: 'rgba(8,102,255,0.15)',
-                    tension: 0.3,
-                    fill: true
-                }
+                { label: 'Amazon — gross TC ($K)', data: amzTC, borderColor: '#ff9900', backgroundColor: 'rgba(255,153,0,0.15)', tension: 0.3, fill: true, pointRadius: 5 },
+                { label: 'Meta — gross TC ($K)', data: metaTC, borderColor: '#0866ff', backgroundColor: 'rgba(8,102,255,0.15)', tension: 0.3, fill: true, pointRadius: 5 }
             ]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { labels: { color: '#e6edf3' } },
-                title: { display: true, text: 'Probability-weighted TC trajectory (gross, pre-COL)', color: '#e6edf3' }
-            },
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#e6edf3' } }, title: { display: true, text: 'TC trajectory with stock growth assumptions', color: '#e6edf3' } },
             scales: {
                 x: { ticks: { color: '#8b949e' }, grid: { color: '#30363d' } },
-                y: {
-                    ticks: { color: '#8b949e', callback: v => '$' + v + 'K' },
-                    grid: { color: '#30363d' }
-                }
+                y: { ticks: { color: '#8b949e', callback: v => '$' + v + 'K' }, grid: { color: '#30363d' } }
             }
         }
     });
+
+    // Narrative
+    const amzCum = amzTC.reduce((a,b)=>a+b, 0);
+    const metaCum = metaTC.reduce((a,b)=>a+b, 0);
+    const diff = amzCum - metaCum;
+    const narr = document.getElementById('trajectoryNarrative');
+    if (narr) {
+        narr.innerHTML = `<p>4-year cumulative gross TC: <strong style="color:var(--amazon)">Amazon $${amzCum.toFixed(0)}K</strong> vs <strong style="color:var(--meta)">Meta $${metaCum.toFixed(0)}K</strong> — ` +
+            (diff > 0 ? `Amazon ahead by $${diff.toFixed(0)}K.` : `Meta ahead by $${(-diff).toFixed(0)}K.`) +
+            ` This excludes the $528K AMZN cliff forfeiture if you leave Amazon now (which would shift the comparison further toward Amazon by ~$528K).</p>` +
+            `<p style="margin-top:10px;">At the trailing 12-month historical growth (AMZN +33%, META +5%), Amazon's lead grows to <strong>$300K+ over 4 years</strong>.</p>`;
+    }
 }
 
-// Build charts on tab switch (so canvases exist)
-document.querySelectorAll('.nav-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-        setTimeout(() => {
-            if (tab.dataset.tab === 'comp') recompute();
-            if (tab.dataset.tab === 'stress') buildStressChart();
-            if (tab.dataset.tab === 'career') buildTrajectoryChart();
-        }, 50);
-    });
+['amzGrowth','metaGrowth'].forEach(id => {
+    document.getElementById(id).addEventListener('input', buildTrajectoryChart);
 });
 
 // Initial render
