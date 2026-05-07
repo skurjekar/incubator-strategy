@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Decision Dashboard — Amazon (Bellevue) vs Meta WhatsApp (SF)</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --amazon: #ff9900;
+            --amazon-dark: #232f3e;
+            --meta: #0866ff;
+            --meta-dark: #0a2540;
+            --bg: #0f1419;
+            --panel: #1a1f2e;
+            --panel-light: #232a3d;
+            --text: #e6edf3;
+            --text-dim: #8b949e;
+            --border: #30363d;
+            --green: #3fb950;
+            --red: #f85149;
+            --yellow: #d29922;
+            --accent: #58a6ff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.55;
+            min-height: 100vh;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #232f3e 0%, #0866ff 100%);
+            padding: 50px 40px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero h1 {
+            font-size: 2.4em;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        .hero .subtitle {
+            font-size: 1.1em;
+            opacity: 0.85;
+            margin-bottom: 24px;
+        }
+        .hero-stats {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .hero-stat {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 10px;
+            padding: 14px 22px;
+            min-width: 160px;
+        }
+        .hero-stat .number { font-size: 1.7em; font-weight: 800; }
+        .hero-stat .label { font-size: 0.85em; opacity: 0.82; }
+
+        .verdict-banner {
+            background: linear-gradient(90deg, #d29922, #f85149);
+            padding: 14px 40px;
+            font-weight: 700;
+            font-size: 1.05em;
+            text-align: center;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: var(--panel);
+            border-bottom: 1px solid var(--border);
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            overflow-x: auto;
+        }
+        .nav-tab {
+            padding: 16px 22px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-dim);
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .nav-tab:hover { color: var(--text); }
+        .nav-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .container { padding: 30px 40px; max-width: 1400px; margin: 0 auto; }
+        .section { display: none; }
+        .section.active { display: block; }
+
+        h2 {
+            font-size: 1.6em;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+        h3 {
+            font-size: 1.15em;
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+        p { color: var(--text-dim); margin-bottom: 12px; }
+
+        .compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        @media (max-width: 800px) {
+            .compare-grid { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+        .card.amazon { border-top: 4px solid var(--amazon); }
+        .card.meta { border-top: 4px solid var(--meta); }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.78em;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .badge.amazon { background: var(--amazon); color: var(--amazon-dark); }
+        .badge.meta { background: var(--meta); color: white; }
+        .badge.green { background: rgba(63,185,80,0.2); color: var(--green); }
+        .badge.red { background: rgba(248,81,73,0.2); color: var(--red); }
+        .badge.yellow { background: rgba(210,153,34,0.2); color: var(--yellow); }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.95em;
+        }
+        .stat-row:last-child { border-bottom: none; }
+        .stat-row .label { color: var(--text-dim); }
+        .stat-row .value { font-weight: 600; }
+        .value.good { color: var(--green); }
+        .value.bad { color: var(--red); }
+        .value.warn { color: var(--yellow); }
+
+        .controls {
+            background: var(--panel-light);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        .control-group {
+            display: grid;
+            grid-template-columns: 200px 1fr 100px;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        @media (max-width: 700px) {
+            .control-group { grid-template-columns: 1fr; }
+        }
+        .control-group label {
+            color: var(--text-dim);
+            font-size: 0.92em;
+        }
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--accent);
+        }
+        .control-value {
+            color: var(--accent);
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .delta {
+            font-size: 1.4em;
+            font-weight: 800;
+            padding: 16px 22px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .delta.positive { background: rgba(63,185,80,0.15); color: var(--green); border: 1px solid var(--green); }
+        .delta.negative { background: rgba(248,81,73,0.15); color: var(--red); border: 1px solid var(--red); }
+        .delta.neutral { background: rgba(210,153,34,0.15); color: var(--yellow); border: 1px solid var(--yellow); }
+
+        .chart-wrap {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            height: 360px;
+        }
+
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 800px) { .pros-cons { grid-template-columns: 1fr; } }
+        .pc-list { list-style: none; padding: 0; }
+        .pc-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.93em;
+        }
+        .pc-list li:last-child { border-bottom: none; }
+        .pc-list li::before {
+            display: inline-block;
+            width: 22px;
+            font-weight: 700;
+        }
+        .pc-list.pros li::before { content: "+"; color: var(--green); }
+        .pc-list.cons li::before { content: "−"; color: var(--red); }
+
+        .recommendation {
+            background: linear-gradient(135deg, #1a1f2e 0%, #232a3d 100%);
+            border: 2px solid var(--accent);
+            border-radius: 14px;
+            padding: 28px;
+            margin-top: 20px;
+        }
+        .recommendation h2 { color: var(--accent); }
+        .rec-verdict {
+            font-size: 1.4em;
+            font-weight: 800;
+            margin: 14px 0;
+            padding: 14px;
+            background: rgba(88,166,255,0.1);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 32px;
+        }
+        .timeline::before {
+            content: "";
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+        .timeline-item {
+            position: relative;
+            padding: 12px 0 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .timeline-item::before {
+            content: "";
+            position: absolute;
+            left: -27px;
+            top: 18px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+        .timeline-item.warn::before { background: var(--yellow); }
+        .timeline-item.bad::before { background: var(--red); }
+        .timeline-item.good::before { background: var(--green); }
+
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 800px) { .scenario-grid { grid-template-columns: 1fr; } }
+        .scenario {
+            padding: 18px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--panel);
+        }
+        .scenario h4 { font-size: 1.05em; margin-bottom: 6px; }
+        .scenario .prob { font-size: 0.85em; color: var(--text-dim); margin-bottom: 10px; }
+        .scenario .outcome { font-size: 0.92em; }
+
+        .source-tag {
+            display: inline-block;
+            font-size: 0.75em;
+            color: var(--text-dim);
+            background: var(--panel-light);
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-left: 6px;
+        }
+
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .footnote {
+            font-size: 0.82em;
+            color: var(--text-dim);
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+
+<div class="hero">
+    <h1>Career Decision Dashboard</h1>
+    <div class="subtitle">Amazon Senior Scientist (Bellevue) vs Meta IC5 Data Scientist, WhatsApp Business (SF)</div>
+    <div class="hero-stats">
+        <div class="hero-stat"><div class="number">$360K</div><div class="label">Current Amazon TC</div></div>
+        <div class="hero-stat"><div class="number">~$390K</div><div class="label">Meta IC5 SF Median</div></div>
+        <div class="hero-stat"><div class="number" id="netDelta">—</div><div class="label">Net-in-hand delta (yr)</div></div>
+        <div class="hero-stat"><div class="number">2026</div><div class="label">Decision Year</div></div>
+    </div>
+</div>
+
+<div class="verdict-banner" id="verdictBanner">
+    Snap verdict: <span id="snapVerdict">Computing…</span>
+</div>
+
+<div class="nav-tabs">
+    <div class="nav-tab active" data-tab="overview">Overview</div>
+    <div class="nav-tab" data-tab="comp">Comp Calculator</div>
+    <div class="nav-tab" data-tab="stress">Stress &amp; WLB</div>
+    <div class="nav-tab" data-tab="career">1yr &amp; 3yr Outlook</div>
+    <div class="nav-tab" data-tab="alts">Alternatives</div>
+    <div class="nav-tab" data-tab="recommendation">Recommendation</div>
+</div>
+
+<div class="container">
+
+<!-- OVERVIEW -->
+<div class="section active" id="overview">
+    <h2>Side-by-Side Snapshot</h2>
+    <div class="compare-grid">
+        <div class="card amazon">
+            <div class="card-header">
+                <h3>Amazon — Senior Scientist (L6)</h3>
+                <span class="badge amazon">Current</span>
+            </div>
+            <div class="stat-row"><span class="label">Location</span><span class="value">Bellevue, WA</span></div>
+            <div class="stat-row"><span class="label">Total Comp</span><span class="value">~$360K</span></div>
+            <div class="stat-row"><span class="label">State Income Tax</span><span class="value good">0%</span></div>
+            <div class="stat-row"><span class="label">L6 median TC (Levels.fyi)</span><span class="value">~$477K<span class="source-tag">Levels</span></span></div>
+            <div class="stat-row"><span class="label">WLB rating (Glassdoor DS)</span><span class="value warn">3.1 / 5</span></div>
+            <div class="stat-row"><span class="label">Recommend rate (DS)</span><span class="value good">78%</span></div>
+            <div class="stat-row"><span class="label">Cost-of-living index</span><span class="value good">Baseline (1.00)</span></div>
+            <div class="stat-row"><span class="label">Layoff risk (2026)</span><span class="value warn">Moderate</span></div>
+        </div>
+
+        <div class="card meta">
+            <div class="card-header">
+                <h3>Meta — IC5 Data Scientist, WhatsApp Business</h3>
+                <span class="badge meta">Offer</span>
+            </div>
+            <div class="stat-row"><span class="label">Location</span><span class="value">San Francisco, CA</span></div>
+            <div class="stat-row"><span class="label">Total Comp (median IC5 SF)</span><span class="value">~$392K<span class="source-tag">Levels</span></span></div>
+            <div class="stat-row"><span class="label">CA Income Tax (marginal)</span><span class="value bad">~10.3–11.3%</span></div>
+            <div class="stat-row"><span class="label">IC5 SF range (Levels.fyi)</span><span class="value">$305K – $480K</span></div>
+            <div class="stat-row"><span class="label">WLB rating (Glassdoor DS)</span><span class="value bad">2.5 / 5</span></div>
+            <div class="stat-row"><span class="label">Recommend rate (DS)</span><span class="value bad">49%</span></div>
+            <div class="stat-row"><span class="label">Cost-of-living index</span><span class="value bad">~1.32 vs Bellevue</span></div>
+            <div class="stat-row"><span class="label">Layoff risk (2026)</span><span class="value bad">Elevated — 8K cuts May 20, more H2</span></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>The core trade-off you described</h3>
+        <p>You said the <strong>net-net pay is roughly equal</strong> after CA tax + SF cost of living. The table above explains <em>why</em>: Meta's higher headline TC gets clawed back by CA income tax (~$30–40K/yr at this income) and ~32% higher cost of living. You are essentially paying for SF lifestyle and Meta's brand with ~the same take-home — and absorbing more risk &amp; stress to do it.</p>
+        <p>So the decision <strong>cannot</strong> be made on money. It has to be made on: (1) career trajectory, (2) life fit / stress tolerance, (3) optionality.</p>
+    </div>
+
+    <div class="compare-grid">
+        <div class="card">
+            <h3>Why this move could be right</h3>
+            <ul class="pc-list pros">
+                <li>Bay Area network density — best AI/ML talent gravity in the world</li>
+                <li>WhatsApp Business is a Meta growth bet (~$138B est. valuation, 50M+ businesses, 175M daily conversations)</li>
+                <li>Meta brand on resume opens FAANG-tier doors faster than Amazon-only path</li>
+                <li>Working on a consumer-scale messaging + commerce surface = unique data + ML problems</li>
+                <li>If you ever want to start a company (your incubator interest), SF beats Bellevue 5:1 on co-founder/VC density</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h3>Why this move could be wrong</h3>
+            <ul class="pc-list cons">
+                <li>Meta PSC (now "Checkpoint") explicitly targets bottom 7–10% — Meta is doing 8K layoffs May 20 2026 with more in H2</li>
+                <li>WLB rating 2.5 vs Amazon's 3.1; "Recommend to a friend" 49% vs 78%</li>
+                <li>You already flagged anxiety as higher at Meta — that compounds over time, not lessens</li>
+                <li>Net-in-hand is roughly flat, so you're trading certainty for risk with no premium</li>
+                <li>Senior Scientist (L6) → IC5 may be a lateral or slight down-level depending on scope; Amazon Principal (L7) is a clearer path internally than Meta E6</li>
+                <li>You'd lose WA's 0% income tax — a structural advantage worth ~$30–40K/yr</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- COMP CALCULATOR -->
+<div class="section" id="comp">
+    <h2>Net-in-Hand Calculator</h2>
+    <p>Adjust the assumptions. The model recomputes net pay after federal + state tax and after cost-of-living normalization.</p>
+
+    <div class="controls">
+        <div class="control-group">
+            <label>Amazon TC ($K/yr)</label>
+            <input type="range" id="amzTC" min="300" max="500" value="360" step="5">
+            <div class="control-value" id="amzTCv">$360K</div>
+        </div>
+        <div class="control-group">
+            <label>Meta TC ($K/yr)</label>
+            <input type="range" id="metaTC" min="300" max="550" value="400" step="5">
+            <div class="control-value" id="metaTCv">$400K</div>
+        </div>
+        <div class="control-group">
+            <label>SF rent premium vs Bellevue ($K/yr)</label>
+            <input type="range" id="rentDelta" min="0" max="40" value="18" step="1">
+            <div class="control-value" id="rentDeltaV">$18K</div>
+        </div>
+        <div class="control-group">
+            <label>Other COL premium ($K/yr)</label>
+            <input type="range" id="colDelta" min="0" max="25" value="8" step="1">
+            <div class="control-value" id="colDeltaV">$8K</div>
+        </div>
+    </div>
+
+    <div class="delta neutral" id="netDeltaCard">Net-in-hand difference: computing…</div>
+
+    <div class="compare-grid">
+        <div class="card amazon">
+            <h3>Amazon — Bellevue (WA, 0% state)</h3>
+            <div class="stat-row"><span class="label">Gross TC</span><span class="value" id="amzGross">—</span></div>
+            <div class="stat-row"><span class="label">Federal tax (est.)</span><span class="value" id="amzFed">—</span></div>
+            <div class="stat-row"><span class="label">State tax</span><span class="value good">$0</span></div>
+            <div class="stat-row"><span class="label">FICA (capped)</span><span class="value" id="amzFica">—</span></div>
+            <div class="stat-row"><span class="label">After-tax</span><span class="value" id="amzNet">—</span></div>
+            <div class="stat-row"><span class="label">After COL adj.</span><span class="value good" id="amzCOL">—</span></div>
+        </div>
+        <div class="card meta">
+            <h3>Meta — San Francisco (CA, ~10.3%)</h3>
+            <div class="stat-row"><span class="label">Gross TC</span><span class="value" id="metaGross">—</span></div>
+            <div class="stat-row"><span class="label">Federal tax (est.)</span><span class="value" id="metaFed">—</span></div>
+            <div class="stat-row"><span class="label">CA state tax</span><span class="value bad" id="metaState">—</span></div>
+            <div class="stat-row"><span class="label">FICA (capped)</span><span class="value" id="metaFica">—</span></div>
+            <div class="stat-row"><span class="label">After-tax</span><span class="value" id="metaNet">—</span></div>
+            <div class="stat-row"><span class="label">After COL adj. (rent + other)</span><span class="value" id="metaCOL">—</span></div>
+        </div>
+    </div>
+
+    <div class="chart-wrap"><canvas id="compChart"></canvas></div>
+
+    <p class="footnote">Federal tax uses 2026 single-filer brackets, simplified. FICA caps SS at $176,100 wage base + 1.45% Medicare + 0.9% additional Medicare above $200K. CA tax uses progressive brackets up to 11.3% marginal at this income. Equity is treated as ordinary income (RSU vest). This is a directional estimator — talk to a CPA before signing.</p>
+</div>
+
+<!-- STRESS -->
+<div class="section" id="stress">
+    <h2>Stress, Anxiety &amp; Work-Life Balance</h2>
+    <p>You explicitly flagged this as the deciding factor. Here is what the public data says — and how it should weight your decision.</p>
+
+    <div class="compare-grid">
+        <div class="card amazon">
+            <h3>Amazon (current baseline)</h3>
+            <div class="stat-row"><span class="label">DS WLB rating</span><span class="value warn">3.1 / 5</span></div>
+            <div class="stat-row"><span class="label">Would recommend</span><span class="value good">78%</span></div>
+            <div class="stat-row"><span class="label">Layoff approach</span><span class="value">Org-level RIFs, less PIP-driven</span></div>
+            <div class="stat-row"><span class="label">Stack-rank pressure</span><span class="value warn">URA "Pivot" exists, but slower cadence</span></div>
+            <div class="stat-row"><span class="label">Your reported anxiety</span><span class="value good">Lower (status quo)</span></div>
+        </div>
+        <div class="card meta">
+            <h3>Meta (proposed)</h3>
+            <div class="stat-row"><span class="label">DS WLB rating</span><span class="value bad">2.5 / 5</span></div>
+            <div class="stat-row"><span class="label">Would recommend</span><span class="value bad">49%</span></div>
+            <div class="stat-row"><span class="label">Layoff approach</span><span class="value bad">Performance-based; 8K cuts May 20 2026, more H2</span></div>
+            <div class="stat-row"><span class="label">Stack-rank pressure</span><span class="value bad">Top 20 / mid 70 / low 7 / bottom 3 (twice/yr)</span></div>
+            <div class="stat-row"><span class="label">Your reported anxiety</span><span class="value bad">Higher (your own words)</span></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Honest read</h3>
+        <p>You are moving from a job where you score yourself "lower anxiety" to one where you score yourself "higher anxiety" — and the public data corroborates the gap (2.5 vs 3.1 WLB, 49% vs 78% recommend). Meta's <strong>twice-a-year</strong> Checkpoint cycle in 2026 is explicitly designed to cull the bottom 10%. On WhatsApp Business specifically, you are joining a team that is being rebuilt around monetization &mdash; high visibility, but also high "show results in 6 months" pressure.</p>
+        <p>Anxiety has a measurable impact on decision quality, sleep, relationships, and creative output. If the financial premium were +$80K/yr you could rationalize trading some health for it. But you said it isn't &mdash; net-in-hand is flat. <strong>You'd be paying for the prestige in stress.</strong></p>
+    </div>
+
+    <div class="chart-wrap"><canvas id="stressChart"></canvas></div>
+</div>
+
+<!-- CAREER OUTLOOK -->
+<div class="section" id="career">
+    <h2>1-Year &amp; 3-Year Prospects (Probabilistic)</h2>
+    <p>Three scenarios per path with rough probabilities. These are not crystal-ball — they're based on Meta's current performance regime and Amazon's historical L6→L7 paths.</p>
+
+    <h3 style="margin-top:24px;">Path A — Stay at Amazon (Bellevue)</h3>
+    <div class="scenario-grid">
+        <div class="scenario">
+            <h4>Best case (35%)</h4>
+            <div class="prob">Promo to Principal (L7) within 18–30 mo</div>
+            <div class="outcome">TC trajectory: $360K → $500K+. Bay Area internal transfer possible at L7. Network builds slowly but durably.</div>
+        </div>
+        <div class="scenario">
+            <h4>Base case (50%)</h4>
+            <div class="prob">Stay L6, refine portfolio + side projects</div>
+            <div class="outcome">TC drifts to $380–420K via refresh. Lower stress, predictable. Incubator/RE side-business gets actual oxygen.</div>
+        </div>
+        <div class="scenario">
+            <h4>Worst case (15%)</h4>
+            <div class="prob">Org RIF or stagnation</div>
+            <div class="outcome">Modest severance (~3–6mo), interview from a position of strength. WA tax shelter still works during job search.</div>
+        </div>
+    </div>
+
+    <h3 style="margin-top:24px;">Path B — Move to Meta IC5 (SF, WhatsApp Business)</h3>
+    <div class="scenario-grid">
+        <div class="scenario">
+            <h4>Best case (25%)</h4>
+            <div class="prob">"Top 20%" rating; promo to E6 in 24–36 mo</div>
+            <div class="outcome">TC trajectory: $390K → $550K+. Strong Meta brand; WhatsApp Business wins → high impact narrative.</div>
+        </div>
+        <div class="scenario">
+            <h4>Base case (45%)</h4>
+            <div class="prob">"Meets All / Most" — survive but treadmill</div>
+            <div class="outcome">TC rises modestly via refresh. High stress. Side projects suffer. Network expands fast in SF.</div>
+        </div>
+        <div class="scenario">
+            <h4>Worst case (30%)</h4>
+            <div class="prob">PSC downgrade or layoff in 12–18 mo</div>
+            <div class="outcome">3-mo severance + rushed job search in CA tax regime. Resume gets a "&lt;2yr Meta stint" stamp. SF lease still on the hook.</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>The asymmetry</h3>
+        <p>Path A's worst case is a 6-month inconvenience. Path B's worst case is a forced job search after sub-2yr tenure, in a higher-COL city, with a CA lease and CA tax exposure on equity vesting. The "30% chance of bad" on Meta is the headline number. <strong>It is much higher than the equivalent risk at Amazon today</strong>.</p>
+    </div>
+
+    <div class="chart-wrap"><canvas id="trajectoryChart"></canvas></div>
+</div>
+
+<!-- ALTERNATIVES -->
+<div class="section" id="alts">
+    <h2>The Alternatives You Should Weigh</h2>
+
+    <div class="card">
+        <h3>Option 1 — Amazon internal transfer to Bay Area</h3>
+        <p><span class="badge green">Recommended to explore first</span></p>
+        <p>Amazon has a real Bay Area presence (Sunnyvale, San Francisco, East Palo Alto, Lab126, AGI). An internal L6 transfer keeps your tenure clock, your stock vest schedule, and your manager relationships — but gives you the Bay Area life you said you want. Downsides: you still pay CA tax, but you don't take Meta-tier layoff risk.</p>
+        <p>Action: post in internal mobility, talk to Amazon Bay Area science orgs (AGI, Alexa AI, AWS AI, Lab126). 4–8 week process.</p>
+    </div>
+
+    <div class="card">
+        <h3>Option 2 — Keep interviewing at peers (Google, Anthropic, OpenAI, Apple, Netflix)</h3>
+        <p><span class="badge yellow">High value — costs you nothing to run</span></p>
+        <p>Right now Meta is your only outside offer. That means you have <strong>zero leverage and one data point</strong>. Spinning up 2–3 more loops in parallel either:</p>
+        <ul class="pc-list pros">
+            <li>Gets you a higher Meta counter (Meta will match competing offers)</li>
+            <li>Surfaces a better fit (Google/Apple WLB tends to score higher than Meta's; Anthropic / OpenAI for ML upside)</li>
+            <li>Lets you say "no" to Meta from a position of strength, not fear</li>
+        </ul>
+        <p>Time cost: ~6–10 weeks. Realistic uplift: a real second offer plus +$50–150K negotiation room on whichever you take.</p>
+    </div>
+
+    <div class="card">
+        <h3>Option 3 — Take Meta as planned</h3>
+        <p><span class="badge red">Only if you can answer "yes" to all three</span></p>
+        <ul class="pc-list pros">
+            <li>You've stress-tested how you handle Meta-style stack rank for 24+ months</li>
+            <li>You have ~9 months of expenses banked in case of layoff</li>
+            <li>You genuinely want SF lifestyle + network for non-career reasons (founding a startup, partner's job, etc.) — and would still want it if comp were the same at both</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h3>Option 4 — Use this offer to negotiate at Amazon</h3>
+        <p><span class="badge yellow">Low risk, often underused</span></p>
+        <p>An external Meta IC5 offer is a credible threat. Bring it to your Amazon manager + skip with a clear ask: an out-of-cycle equity refresh, an L7 promo plan with milestones, and/or an internal transfer to the Bay Area. Worst case: they say no and you're back to today's choice.</p>
+    </div>
+</div>
+
+<!-- RECOMMENDATION -->
+<div class="section" id="recommendation">
+    <h2>Recommendation</h2>
+
+    <div class="recommendation">
+        <div class="rec-verdict">Don't take the Meta offer as-is. Don't simply stay either.</div>
+        <p>Given everything you told me — equal net-in-hand, higher anxiety at Meta, and a personal interest in the Bay Area — taking Meta IC5 is a <strong>negative-expected-value</strong> move on a risk-adjusted basis. You'd be trading a known, lower-stress, tax-advantaged role for a higher-stress role at a company actively running performance-based layoffs in 2026, for no real cash premium.</p>
+
+        <h3 style="margin-top:18px;">The 90-day playbook I'd run if I were you</h3>
+        <ol class="timeline" style="list-style:none;">
+            <li class="timeline-item good"><strong>Weeks 1–2:</strong> Initiate Amazon internal mobility conversations for Bay Area orgs (AGI, AWS AI, Lab126). Tell your manager you're exploring — not threatening.</li>
+            <li class="timeline-item"><strong>Weeks 1–6:</strong> Open 2–3 parallel interview loops (Google, Apple, Anthropic). Pick teams with better WLB signals than Meta's.</li>
+            <li class="timeline-item warn"><strong>Weeks 4–6:</strong> Use the live Meta offer as leverage — either get an Amazon equity refresh / L7 plan, or a stronger competing offer.</li>
+            <li class="timeline-item"><strong>Weeks 6–10:</strong> Re-decide with at least 2 outside offers + 1 internal counter on the table. Now the choice is informed.</li>
+            <li class="timeline-item bad"><strong>Decline Meta now if:</strong> the offer expires before you can run this. Walking away from a flat-net-pay, higher-stress role is a non-event.</li>
+        </ol>
+
+        <h3 style="margin-top:18px;">Decision rule, in one sentence</h3>
+        <p style="font-size:1.05em;color:var(--text);">Take Meta only if (a) net comp clears Amazon by ≥ $60K/yr after CA tax + COL, <em>or</em> (b) the team/scope is so strategic (e.g., direct reports, product ownership, AI infra leadership) that it's effectively a promo. Neither is true based on what you described — so the answer is no, with a plan.</p>
+    </div>
+
+    <div class="footnote">
+        <strong>Sources used to build this dashboard:</strong>
+        <ul style="margin-top:8px;">
+            <li><a href="https://www.levels.fyi/companies/meta/salaries/data-scientist/levels/ic5/locations/san-francisco-bay-area" target="_blank">Levels.fyi — Meta IC5 Data Scientist, SF Bay Area</a></li>
+            <li><a href="https://www.levels.fyi/companies/amazon/salaries/senior-applied-scientist/levels/l6" target="_blank">Levels.fyi — Amazon L6 Senior Applied Scientist</a></li>
+            <li><a href="https://www.numbeo.com/cost-of-living/compare_cities.jsp?country1=United+States&city1=San+Francisco,+CA&country2=United+States&city2=Bellevue,+WA" target="_blank">Numbeo — SF vs Bellevue Cost of Living</a></li>
+            <li><a href="https://www.glassdoor.com/Reviews/Meta-Data-Scientist-Reviews-EI_IE40772.0,4_KO5,19.htm" target="_blank">Glassdoor — Meta Data Scientist Reviews</a></li>
+            <li><a href="https://www.glassdoor.com/Reviews/Amazon-Data-Scientist-Reviews-EI_IE6036.0,6_KO7,21.htm" target="_blank">Glassdoor — Amazon Data Scientist Reviews</a></li>
+            <li><a href="https://www.thehrdigest.com/how-is-metas-performance-review-system-changing-in-2026-a-closer-look/" target="_blank">HR Digest — Meta Checkpoint 2026 Performance System</a></li>
+            <li><a href="https://thenextweb.com/news/meta-layoffs-may-2026-ai-restructuring-thousands" target="_blank">TNW — Meta May 20 2026 layoff announcement</a></li>
+            <li><a href="https://mobileecosystemforum.com/2026/04/08/whatsapp-business-april-2026/" target="_blank">MEF — WhatsApp Business April 2026</a></li>
+            <li><a href="https://www.amazon.science/locations/san-francisco-bay-area" target="_blank">Amazon Science — SF Bay Area locations</a></li>
+        </ul>
+        <p style="margin-top:10px;">This is decision-support, not financial or legal advice. Validate tax math with a CPA and offer details with an employment lawyer before signing.</p>
+    </div>
+</div>
+
+</div>
+
+<script>
+// Tabs
+document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.tab).classList.add('active');
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    });
+});
+
+// ---------- Tax helpers ----------
+function fedTax(income) {
+    // 2026 single-filer brackets (projected, simplified)
+    const brackets = [
+        [0,        0.10],
+        [11925,    0.12],
+        [48475,    0.22],
+        [103350,   0.24],
+        [197300,   0.32],
+        [250525,   0.35],
+        [626350,   0.37]
+    ];
+    let tax = 0;
+    for (let i = 0; i < brackets.length; i++) {
+        const lower = brackets[i][0];
+        const upper = i < brackets.length - 1 ? brackets[i+1][0] : Infinity;
+        const rate  = brackets[i][1];
+        if (income > lower) tax += (Math.min(income, upper) - lower) * rate;
+    }
+    return tax;
+}
+function caTax(income) {
+    // 2026 CA single-filer brackets (simplified, top bracket excludes mental-health 1%)
+    const brackets = [
+        [0,        0.01],
+        [10412,    0.02],
+        [24684,    0.04],
+        [38959,    0.06],
+        [54081,    0.08],
+        [68350,    0.093],
+        [349137,   0.103],
+        [418961,   0.113],
+        [698271,   0.123]
+    ];
+    let tax = 0;
+    for (let i = 0; i < brackets.length; i++) {
+        const lower = brackets[i][0];
+        const upper = i < brackets.length - 1 ? brackets[i+1][0] : Infinity;
+        const rate  = brackets[i][1];
+        if (income > lower) tax += (Math.min(income, upper) - lower) * rate;
+    }
+    return tax;
+}
+function fica(income) {
+    const ssCap = 176100;
+    const ss = Math.min(income, ssCap) * 0.062;
+    const medicare = income * 0.0145;
+    const addlMed = Math.max(0, income - 200000) * 0.009;
+    return ss + medicare + addlMed;
+}
+function fmt(n) {
+    return "$" + Math.round(n/1000) + "K";
+}
+
+// ---------- Comp calculator ----------
+function recompute() {
+    const amzTC  = +document.getElementById('amzTC').value * 1000;
+    const metaTC = +document.getElementById('metaTC').value * 1000;
+    const rentDelta = +document.getElementById('rentDelta').value * 1000;
+    const colDelta  = +document.getElementById('colDelta').value * 1000;
+
+    document.getElementById('amzTCv').textContent = fmt(amzTC);
+    document.getElementById('metaTCv').textContent = fmt(metaTC);
+    document.getElementById('rentDeltaV').textContent = fmt(rentDelta);
+    document.getElementById('colDeltaV').textContent = fmt(colDelta);
+
+    const amzFedT = fedTax(amzTC);
+    const amzFicaT = fica(amzTC);
+    const amzNet = amzTC - amzFedT - amzFicaT;
+    const amzCOL = amzNet; // baseline
+
+    const metaFedT  = fedTax(metaTC);
+    const metaState = caTax(metaTC);
+    const metaFicaT = fica(metaTC);
+    const metaNet   = metaTC - metaFedT - metaState - metaFicaT;
+    const metaCOL   = metaNet - rentDelta - colDelta;
+
+    document.getElementById('amzGross').textContent = fmt(amzTC);
+    document.getElementById('amzFed').textContent = "−" + fmt(amzFedT);
+    document.getElementById('amzFica').textContent = "−" + fmt(amzFicaT);
+    document.getElementById('amzNet').textContent = fmt(amzNet);
+    document.getElementById('amzCOL').textContent = fmt(amzCOL);
+
+    document.getElementById('metaGross').textContent = fmt(metaTC);
+    document.getElementById('metaFed').textContent = "−" + fmt(metaFedT);
+    document.getElementById('metaState').textContent = "−" + fmt(metaState);
+    document.getElementById('metaFica').textContent = "−" + fmt(metaFicaT);
+    document.getElementById('metaNet').textContent = fmt(metaNet);
+    document.getElementById('metaCOL').textContent = fmt(metaCOL);
+
+    const delta = metaCOL - amzCOL;
+    const deltaCard = document.getElementById('netDeltaCard');
+    const sign = delta >= 0 ? "+" : "−";
+    deltaCard.textContent = "Net-in-hand difference (Meta − Amazon, after taxes & COL): " + sign + fmt(Math.abs(delta)) + "/yr";
+    deltaCard.className = "delta " + (delta > 8000 ? "positive" : delta < -8000 ? "negative" : "neutral");
+
+    // Hero stat
+    document.getElementById('netDelta').textContent = (delta >= 0 ? "+" : "−") + fmt(Math.abs(delta));
+
+    // Snap verdict
+    const verdict = document.getElementById('snapVerdict');
+    if (delta < -10000) {
+        verdict.textContent = "Don't move — you'd lose money AND gain stress.";
+    } else if (delta < 15000) {
+        verdict.textContent = "Net pay is roughly flat — no financial reason to move; decide on lifestyle/career fit.";
+    } else if (delta < 50000) {
+        verdict.textContent = "Modest pay bump — likely not enough to offset Meta's higher stress and layoff risk.";
+    } else {
+        verdict.textContent = "Material pay bump — re-run the stress trade-off; might be worth it.";
+    }
+
+    // Update charts
+    updateCompChart(amzTC, amzCOL, metaTC, metaCOL, amzFedT, metaFedT, metaState, amzFicaT, metaFicaT, rentDelta, colDelta);
+}
+
+['amzTC','metaTC','rentDelta','colDelta'].forEach(id => {
+    document.getElementById(id).addEventListener('input', recompute);
+});
+
+// ---------- Charts ----------
+let compChart, stressChart, trajectoryChart;
+
+function updateCompChart(amzTC, amzCOL, metaTC, metaCOL, amzFed, metaFed, metaState, amzFica, metaFica, rentDelta, colDelta) {
+    const ctx = document.getElementById('compChart');
+    if (!ctx) return;
+    const data = {
+        labels: ['Gross TC', 'After fed tax', 'After state tax', 'After FICA', 'After COL adj.'],
+        datasets: [
+            {
+                label: 'Amazon (Bellevue)',
+                data: [amzTC, amzTC - amzFed, amzTC - amzFed, amzTC - amzFed - amzFica, amzCOL],
+                borderColor: '#ff9900',
+                backgroundColor: 'rgba(255,153,0,0.15)',
+                tension: 0.25,
+                fill: true
+            },
+            {
+                label: 'Meta (SF)',
+                data: [metaTC, metaTC - metaFed, metaTC - metaFed - metaState, metaTC - metaFed - metaState - metaFica, metaCOL],
+                borderColor: '#0866ff',
+                backgroundColor: 'rgba(8,102,255,0.15)',
+                tension: 0.25,
+                fill: true
+            }
+        ]
+    };
+    if (compChart) compChart.destroy();
+    compChart = new Chart(ctx, {
+        type: 'line',
+        data,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { labels: { color: '#e6edf3' } },
+                title: { display: true, text: 'Where the money goes', color: '#e6edf3' }
+            },
+            scales: {
+                x: { ticks: { color: '#8b949e' }, grid: { color: '#30363d' } },
+                y: {
+                    ticks: { color: '#8b949e', callback: v => '$' + (v/1000).toFixed(0) + 'K' },
+                    grid: { color: '#30363d' }
+                }
+            }
+        }
+    });
+}
+
+function buildStressChart() {
+    const ctx = document.getElementById('stressChart');
+    if (!ctx) return;
+    if (stressChart) stressChart.destroy();
+    stressChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['Work-life balance', 'Recommend rate', 'Job security 2026', 'Calendar control', 'Stack-rank pressure (lower is better)', 'Your reported anxiety (lower is better)'],
+            datasets: [
+                {
+                    label: 'Amazon (Bellevue)',
+                    data: [62, 78, 65, 60, 55, 70],
+                    backgroundColor: 'rgba(255,153,0,0.2)',
+                    borderColor: '#ff9900'
+                },
+                {
+                    label: 'Meta (SF)',
+                    data: [50, 49, 40, 45, 25, 35],
+                    backgroundColor: 'rgba(8,102,255,0.2)',
+                    borderColor: '#0866ff'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { labels: { color: '#e6edf3' } },
+                title: { display: true, text: 'Lifestyle + risk axes (higher = better)', color: '#e6edf3' }
+            },
+            scales: {
+                r: {
+                    angleLines: { color: '#30363d' },
+                    grid: { color: '#30363d' },
+                    pointLabels: { color: '#e6edf3' },
+                    ticks: { color: '#8b949e', backdropColor: 'transparent' },
+                    suggestedMin: 0,
+                    suggestedMax: 100
+                }
+            }
+        }
+    });
+}
+
+function buildTrajectoryChart() {
+    const ctx = document.getElementById('trajectoryChart');
+    if (!ctx) return;
+    if (trajectoryChart) trajectoryChart.destroy();
+    // Probability-weighted expected TC trajectory over 3 years
+    // Amazon: 0.35*aggressive + 0.50*base + 0.15*worst
+    // Meta:   0.25*aggressive + 0.45*base + 0.30*worst
+    const amzExp = [
+        360,
+        0.35*420 + 0.50*385 + 0.15*340,
+        0.35*470 + 0.50*410 + 0.15*360,
+        0.35*520 + 0.50*430 + 0.15*380
+    ];
+    const metaExp = [
+        390,
+        0.25*460 + 0.45*410 + 0.30*330,
+        0.25*520 + 0.45*430 + 0.30*340,
+        0.25*580 + 0.45*450 + 0.30*360
+    ];
+    trajectoryChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Now', 'Yr 1', 'Yr 2', 'Yr 3'],
+            datasets: [
+                {
+                    label: 'Amazon — expected TC ($K)',
+                    data: amzExp,
+                    borderColor: '#ff9900',
+                    backgroundColor: 'rgba(255,153,0,0.15)',
+                    tension: 0.3,
+                    fill: true
+                },
+                {
+                    label: 'Meta — expected TC ($K, prob-weighted)',
+                    data: metaExp,
+                    borderColor: '#0866ff',
+                    backgroundColor: 'rgba(8,102,255,0.15)',
+                    tension: 0.3,
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { labels: { color: '#e6edf3' } },
+                title: { display: true, text: 'Probability-weighted TC trajectory (gross, pre-COL)', color: '#e6edf3' }
+            },
+            scales: {
+                x: { ticks: { color: '#8b949e' }, grid: { color: '#30363d' } },
+                y: {
+                    ticks: { color: '#8b949e', callback: v => '$' + v + 'K' },
+                    grid: { color: '#30363d' }
+                }
+            }
+        }
+    });
+}
+
+// Build charts on tab switch (so canvases exist)
+document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        setTimeout(() => {
+            if (tab.dataset.tab === 'comp') recompute();
+            if (tab.dataset.tab === 'stress') buildStressChart();
+            if (tab.dataset.tab === 'career') buildTrajectoryChart();
+        }, 50);
+    });
+});
+
+// Initial render
+recompute();
+</script>
+
+</body>
+</html>
