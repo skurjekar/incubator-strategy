@@ -9,6 +9,8 @@
         :root {
             --amazon: #ff9900;
             --amazon-dark: #232f3e;
+            --amazon-sf: #00c2a8;
+            --amazon-sf-dark: #003e36;
             --meta: #0866ff;
             --meta-dark: #0a2540;
             --bg: #0f1419;
@@ -129,6 +131,12 @@
             gap: 20px;
             margin-bottom: 24px;
         }
+        .compare-grid.three {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+        @media (max-width: 1100px) {
+            .compare-grid.three { grid-template-columns: 1fr; }
+        }
         @media (max-width: 800px) {
             .compare-grid { grid-template-columns: 1fr; }
         }
@@ -141,6 +149,7 @@
             margin-bottom: 16px;
         }
         .card.amazon { border-top: 4px solid var(--amazon); }
+        .card.amazon-sf { border-top: 4px solid var(--amazon-sf); }
         .card.meta { border-top: 4px solid var(--meta); }
         .card.critical {
             border: 2px solid var(--critical);
@@ -161,6 +170,7 @@
             text-transform: uppercase;
         }
         .badge.amazon { background: var(--amazon); color: var(--amazon-dark); }
+        .badge.amazon-sf { background: var(--amazon-sf); color: var(--amazon-sf-dark); }
         .badge.meta { background: var(--meta); color: white; }
         .badge.green { background: rgba(63,185,80,0.2); color: var(--green); }
         .badge.red { background: rgba(248,81,73,0.2); color: var(--red); }
@@ -407,8 +417,8 @@
 <body>
 
 <div class="hero">
-    <h1>Career Decision Dashboard <span style="font-size:0.5em;color:var(--green);">v2 — REAL OFFERS</span></h1>
-    <div class="subtitle">Amazon Sr. Data Scientist (Bellevue, WA) vs Meta Data Scientist (Menlo Park, CA) — using actual offer letters &amp; live AMZN/META prices</div>
+    <h1>Career Decision Dashboard <span style="font-size:0.5em;color:var(--green);">v3 — 3-WAY COMPARISON</span></h1>
+    <div class="subtitle">Amazon Bellevue (stay) vs Amazon SF (internal transfer) vs Meta Menlo Park (offer) — actual offer letters &amp; live AMZN/META prices</div>
     <div class="hero-stats">
         <div class="hero-stat"><div class="number">$190K</div><div class="label">Amazon base</div></div>
         <div class="hero-stat"><div class="number">$232K</div><div class="label">Meta base</div></div>
@@ -451,46 +461,63 @@
         </div>
     </div>
 
-    <h2>Side-by-Side Snapshot — Real Numbers</h2>
-    <div class="compare-grid">
+    <h2>Three-Way Snapshot — Real Numbers</h2>
+    <div class="compare-grid three">
         <div class="card amazon">
             <div class="card-header">
-                <h3>Amazon — Sr. Data Scientist</h3>
-                <span class="badge amazon">Current</span>
+                <h3>Amazon — Bellevue (status quo)</h3>
+                <span class="badge amazon">Stay</span>
             </div>
-            <div class="stat-row"><span class="label">Org</span><span class="value">WW Fulfillment Design Engineering</span></div>
+            <div class="stat-row"><span class="label">Org</span><span class="value">WW Fulfillment Design Eng</span></div>
             <div class="stat-row"><span class="label">Location</span><span class="value">Bellevue, WA (SEA112)</span></div>
-            <div class="stat-row"><span class="label">Start date</span><span class="value">July 14, 2025</span></div>
             <div class="stat-row"><span class="label">Base salary</span><span class="value">$190,000<span class="source-tag real">offer</span></span></div>
-            <div class="stat-row"><span class="label">Y1 sign-on (installments)</span><span class="value">$157,000<span class="source-tag real">offer</span></span></div>
-            <div class="stat-row"><span class="label">Y2 sign-on (installments)</span><span class="value">$117,400<span class="source-tag real">offer</span></span></div>
-            <div class="stat-row"><span class="label">RSU grant</span><span class="value">1,930 AMZN shares<span class="source-tag real">offer</span></span></div>
-            <div class="stat-row"><span class="label">Vest schedule</span><span class="value">5 / 15 / 40 / 40 (yrs)</span></div>
-            <div class="stat-row"><span class="label">AMZN price (May 7, 2026)</span><span class="value good">$273.55<span class="source-tag">Yahoo</span></span></div>
-            <div class="stat-row"><span class="label">AMZN 1-yr return</span><span class="value good">+33.4%</span></div>
-            <div class="stat-row"><span class="label">Total grant value @ today's price</span><span class="value good">$528K</span></div>
-            <div class="stat-row"><span class="label">State income tax</span><span class="value good">0%</span></div>
-            <div class="stat-row"><span class="label">Non-compete (post-WA threshold)</span><span class="value warn">18 months — could apply</span></div>
+            <div class="stat-row"><span class="label">Y1 sign-on</span><span class="value">$157,000<span class="source-tag real">offer</span></span></div>
+            <div class="stat-row"><span class="label">Y2 sign-on</span><span class="value">$117,400<span class="source-tag real">offer</span></span></div>
+            <div class="stat-row"><span class="label">RSU</span><span class="value">1,930 AMZN, 5/15/40/40<span class="source-tag real">offer</span></span></div>
+            <div class="stat-row"><span class="label">AMZN price</span><span class="value good">$273.55<span class="source-tag">Yahoo</span></span></div>
+            <div class="stat-row"><span class="label">AMZN cliff status</span><span class="value good">Vest July 15, 2026</span></div>
+            <div class="stat-row"><span class="label">State income tax</span><span class="value good">0% (WA)</span></div>
+            <div class="stat-row"><span class="label">Cost of living</span><span class="value good">Baseline</span></div>
+            <div class="stat-row"><span class="label">Stress / WLB</span><span class="value warn">3.1 / 5</span></div>
+            <div class="stat-row"><span class="label">Move cost</span><span class="value good">$0</span></div>
+        </div>
+
+        <div class="card amazon-sf">
+            <div class="card-header">
+                <h3>Amazon — SF Bay Area (internal transfer)</h3>
+                <span class="badge amazon-sf">Transfer</span>
+            </div>
+            <div class="stat-row"><span class="label">Org</span><span class="value">AGI / AWS AI / Lab126 / etc.</span></div>
+            <div class="stat-row"><span class="label">Location</span><span class="value">SF / Sunnyvale / EPA</span></div>
+            <div class="stat-row"><span class="label">Base salary</span><span class="value">~$200,000<span class="source-tag">est. modest locality bump</span></span></div>
+            <div class="stat-row"><span class="label">Y1 sign-on</span><span class="value good">$157,000<span class="source-tag">retained</span></span></div>
+            <div class="stat-row"><span class="label">Y2 sign-on</span><span class="value good">$117,400<span class="source-tag">retained</span></span></div>
+            <div class="stat-row"><span class="label">RSU</span><span class="value good">1,930 AMZN preserved<span class="source-tag">no forfeit</span></span></div>
+            <div class="stat-row"><span class="label">AMZN price</span><span class="value good">$273.55</span></div>
+            <div class="stat-row"><span class="label">AMZN cliff status</span><span class="value good">Preserved (no forfeit)</span></div>
+            <div class="stat-row"><span class="label">State income tax</span><span class="value bad">~10.3% (CA)</span></div>
+            <div class="stat-row"><span class="label">Cost of living</span><span class="value bad">~32% premium vs Bellevue</span></div>
+            <div class="stat-row"><span class="label">Stress / WLB</span><span class="value warn">3.1 / 5 (Amazon culture)</span></div>
+            <div class="stat-row"><span class="label">Move cost</span><span class="value warn">Relocation pkg + 4-8 wk transition</span></div>
         </div>
 
         <div class="card meta">
             <div class="card-header">
-                <h3>Meta — Data Scientist</h3>
+                <h3>Meta — Menlo Park (jump)</h3>
                 <span class="badge meta">Offer</span>
             </div>
             <div class="stat-row"><span class="label">Org</span><span class="value">Reports to Sumit Sewlani</span></div>
-            <div class="stat-row"><span class="label">Location</span><span class="value warn">Menlo Park, CA <em>(not SF)</em><span class="source-tag real">offer</span></span></div>
-            <div class="stat-row"><span class="label">Start date</span><span class="value">April 27, 2026</span></div>
+            <div class="stat-row"><span class="label">Location</span><span class="value warn">Menlo Park (not SF)<span class="source-tag real">offer</span></span></div>
             <div class="stat-row"><span class="label">Base salary</span><span class="value">$232,000<span class="source-tag real">offer</span></span></div>
             <div class="stat-row"><span class="label">Bonus target</span><span class="value">15% = $34,800<span class="source-tag real">offer</span></span></div>
             <div class="stat-row"><span class="label">Sign-on (1yr clawback)</span><span class="value">$30,000<span class="source-tag real">offer</span></span></div>
-            <div class="stat-row"><span class="label">Relocation advance</span><span class="value">Separate agmt (not specified)</span></div>
-            <div class="stat-row"><span class="label">RSU initial value</span><span class="value">$425,000<span class="source-tag real">offer</span></span></div>
-            <div class="stat-row"><span class="label">Vest schedule</span><span class="value">25 / 25 / 25 / 25 (qtrly 6.25%)</span></div>
-            <div class="stat-row"><span class="label">META price (May 7, 2026)</span><span class="value warn">$611.88<span class="source-tag">Yahoo</span></span></div>
-            <div class="stat-row"><span class="label">META 1-yr return</span><span class="value bad">+4.7% (under-performed AMZN by ~30 pts)</span></div>
-            <div class="stat-row"><span class="label">CA income tax</span><span class="value bad">~10.3% marginal</span></div>
-            <div class="stat-row"><span class="label">Layoff regime</span><span class="value bad">Checkpoint 2x/yr; 8K cuts May 20 2026</span></div>
+            <div class="stat-row"><span class="label">RSU</span><span class="value">$425K initial / 4yr qtrly<span class="source-tag real">offer</span></span></div>
+            <div class="stat-row"><span class="label">META price</span><span class="value warn">$611.88<span class="source-tag">Yahoo</span></span></div>
+            <div class="stat-row"><span class="label">AMZN cliff status</span><span class="value critical">−$528K forfeit if start now</span></div>
+            <div class="stat-row"><span class="label">State income tax</span><span class="value bad">~10.3% (CA)</span></div>
+            <div class="stat-row"><span class="label">Cost of living</span><span class="value bad">~32% premium vs Bellevue</span></div>
+            <div class="stat-row"><span class="label">Stress / WLB</span><span class="value bad">2.5 / 5; PSC 2x/yr; 8K cuts May 20</span></div>
+            <div class="stat-row"><span class="label">Move cost</span><span class="value bad">Relo + AMZN equity forfeit</span></div>
         </div>
     </div>
 
@@ -508,8 +535,9 @@
 
 <!-- REAL OFFERS -->
 <div class="section" id="offers">
-    <h2>Real Offer Numbers — Year-by-Year</h2>
-    <p>This is what the offer letters actually say, year-by-year, valued at today's stock prices ($273.55 AMZN, $611.88 META). Federal &amp; state taxes are estimated; FICA capped per 2026 limits.</p>
+    <h2>Real Offer Numbers — Year-by-Year (3-way)</h2>
+    <p>Three scenarios compared, valued at today's stock prices ($273.55 AMZN, $611.88 META). Federal &amp; state taxes are estimated; FICA capped per 2026 limits.</p>
+    <p style="font-size:0.9em;"><strong>Scenarios:</strong> (1) Stay at Amazon Bellevue, (2) Internal transfer to Amazon SF Bay Area (assumes ~5% locality bump on base; Amazon does not typically pay full FAANG-style locality differential), (3) Jump to Meta Menlo Park.</p>
 
     <h3 style="margin-top:20px;">Amazon — projected gross TC by year (at AMZN $273.55)</h3>
     <div class="card amazon">
@@ -546,6 +574,43 @@
             </tbody>
         </table>
         <p style="margin-top:10px;font-size:0.88em;">4-year cumulative net (after-tax, after-COL): <strong style="color:var(--green);">~$1.064M</strong>.</p>
+    </div>
+
+    <h3 style="margin-top:24px;">Amazon SF transfer — projected gross TC by year (at AMZN $273.55, $200K base)</h3>
+    <div class="card amazon-sf">
+        <table class="year-table">
+            <thead>
+                <tr><th>Component</th><th>Y1 (FY26)</th><th>Y2 (FY27)</th><th>Y3 (FY28)</th><th>Y4 (FY29)</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Base salary (locality-adjusted)</td><td>$200,000</td><td>$200,000</td><td>$200,000</td><td>$200,000</td></tr>
+                <tr><td>Sign-on bonus (retained)</td><td>$157,000</td><td>$117,400</td><td>—</td><td>—</td></tr>
+                <tr><td>RSU vest (% of 1,930)</td><td>5% = 96.5 sh</td><td>15% = 289.5 sh</td><td>40% = 772 sh</td><td>40% = 772 sh</td></tr>
+                <tr><td>RSU $ value (at $273.55)</td><td>$26,398</td><td>$79,193</td><td>$211,180</td><td>$211,180</td></tr>
+                <tr class="total"><td>Total gross TC</td><td>$383,398</td><td>$396,593</td><td>$411,180</td><td>$411,180</td></tr>
+            </tbody>
+        </table>
+        <p style="margin-top:10px;font-size:0.88em;">4-year cumulative gross TC: <strong style="color:var(--amazon-sf);">~$1.60M</strong>. <strong>Retains the AMZN cliff and Y2 sign-on.</strong> Adds ~$10K/yr base over Bellevue (5% locality bump assumption). Same back-loaded RSU advantage as Bellevue.</p>
+    </div>
+
+    <h3 style="margin-top:20px;">Amazon SF transfer — after-tax (San Francisco, CA — ~10.3% marginal)</h3>
+    <div class="card amazon-sf">
+        <table class="year-table">
+            <thead>
+                <tr><th>Component</th><th>Y1 (FY26)</th><th>Y2 (FY27)</th><th>Y3 (FY28)</th><th>Y4 (FY29)</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Gross TC</td><td>$383,398</td><td>$396,593</td><td>$411,180</td><td>$411,180</td></tr>
+                <tr><td>Federal tax (single, 2026)</td><td style="color:var(--red);">−$103,737</td><td style="color:var(--red);">−$108,355</td><td style="color:var(--red);">−$113,460</td><td style="color:var(--red);">−$113,460</td></tr>
+                <tr><td>CA state tax (progressive)</td><td style="color:var(--red);">−$32,650</td><td style="color:var(--red);">−$34,010</td><td style="color:var(--red);">−$35,512</td><td style="color:var(--red);">−$35,512</td></tr>
+                <tr><td>FICA (SS cap + Medicare)</td><td style="color:var(--red);">−$18,128</td><td style="color:var(--red);">−$18,438</td><td style="color:var(--red);">−$18,781</td><td style="color:var(--red);">−$18,781</td></tr>
+                <tr class="total"><td>Net take-home</td><td>$228,883</td><td>$235,790</td><td>$243,427</td><td>$243,427</td></tr>
+                <tr><td>Effective tax rate</td><td>40.3%</td><td>40.6%</td><td>40.8%</td><td>40.8%</td></tr>
+                <tr><td>SF/Bay Area COL premium</td><td style="color:var(--red);">−$29,000</td><td style="color:var(--red);">−$29,000</td><td style="color:var(--red);">−$29,000</td><td style="color:var(--red);">−$29,000</td></tr>
+                <tr class="total"><td>Net after COL</td><td>$199,883</td><td>$206,790</td><td>$214,427</td><td>$214,427</td></tr>
+            </tbody>
+        </table>
+        <p style="margin-top:10px;font-size:0.88em;">4-year cumulative net (after-tax, after-COL): <strong style="color:var(--amazon-sf);">~$835.5K</strong>. The CA tax drag is similar to Meta (~$32-36K/yr), but the AMZN equity ramp in Y3-Y4 keeps cumulative net higher than Meta's flat profile.</p>
     </div>
 
     <h3 style="margin-top:24px;">Meta — projected gross TC by year (at META $611.88)</h3>
@@ -586,31 +651,41 @@
         <p style="margin-top:10px;font-size:0.88em;">4-year cumulative net (after-tax, after-COL): <strong>~$793.6K</strong>. CA state tax alone costs you ~$31-35K/yr more than WA.</p>
     </div>
 
-    <h3 style="margin-top:24px;">Head-to-head — gross vs net vs net-after-COL</h3>
+    <h3 style="margin-top:24px;">Head-to-head — 3-way 4-year cumulative</h3>
     <div class="card">
         <table class="year-table">
             <thead>
-                <tr><th>Comparison (4-year cumulative)</th><th>Amazon (Bellevue)</th><th>Meta (Menlo Park)</th><th>Δ (Amazon − Meta)</th></tr>
+                <tr><th>Comparison (4-year cumulative)</th><th style="color:var(--amazon);">Amazon Bellevue</th><th style="color:var(--amazon-sf);">Amazon SF</th><th style="color:var(--meta);">Meta Menlo Park</th></tr>
             </thead>
             <tbody>
-                <tr><td>Gross TC</td><td>$1,562,351</td><td>$1,522,200</td><td style="color:var(--green);">+$40,151</td></tr>
-                <tr><td>Federal tax</td><td>−$425,012</td><td>−$410,960</td><td>−$14,052</td></tr>
-                <tr><td>State tax</td><td style="color:var(--green);">$0</td><td style="color:var(--red);">−$129,434</td><td style="color:var(--green);">+$129,434</td></tr>
-                <tr><td>FICA</td><td>−$73,188</td><td>−$72,245</td><td>−$943</td></tr>
-                <tr class="total"><td>Net take-home (after tax)</td><td style="color:var(--green);">$1,064,151</td><td>$909,561</td><td style="color:var(--green);">+$154,590</td></tr>
-                <tr><td>COL adjustment (Menlo Park premium)</td><td>$0</td><td style="color:var(--red);">−$116,000</td><td style="color:var(--green);">+$116,000</td></tr>
-                <tr class="total"><td>Net after-tax + after-COL</td><td style="color:var(--green);">$1,064,151</td><td>$793,561</td><td style="color:var(--green);">+$270,590</td></tr>
+                <tr><td>Gross TC</td><td>$1,562,351</td><td style="color:var(--amazon-sf);">$1,602,351</td><td>$1,522,200</td></tr>
+                <tr><td>Federal tax</td><td>−$425,012</td><td>−$439,012</td><td>−$410,960</td></tr>
+                <tr><td>State tax</td><td style="color:var(--green);">$0</td><td style="color:var(--red);">−$137,684</td><td style="color:var(--red);">−$129,434</td></tr>
+                <tr><td>FICA</td><td>−$73,188</td><td>−$74,128</td><td>−$72,245</td></tr>
+                <tr class="total"><td>Net take-home (after tax)</td><td style="color:var(--green);">$1,064,151</td><td>$951,527</td><td>$909,561</td></tr>
+                <tr><td>COL premium (vs Bellevue)</td><td>$0</td><td style="color:var(--red);">−$116,000</td><td style="color:var(--red);">−$116,000</td></tr>
+                <tr class="total"><td>Net after-tax + after-COL</td><td style="color:var(--green);">$1,064,151</td><td>$835,527</td><td>$793,561</td></tr>
+                <tr><td>AMZN cliff forfeiture if exit now</td><td>$0</td><td>$0</td><td style="color:var(--critical);">−$528,000</td></tr>
+                <tr class="total"><td>Net after cliff impact</td><td style="color:var(--green);">$1,064,151</td><td style="color:var(--amazon-sf);">$835,527</td><td style="color:var(--red);">$265,561</td></tr>
             </tbody>
         </table>
-        <p style="margin-top:14px;color:var(--text);"><strong>Bottom line:</strong> Even ignoring the $528K AMZN cliff forfeiture, staying at Amazon nets you <strong style="color:var(--green);">~$270K more over 4 years</strong> after taxes and cost-of-living adjustment. Add the cliff forfeiture and the gap widens to <strong style="color:var(--green);">~$800K over 4 years</strong> in Amazon's favor.</p>
-        <p style="color:var(--text);">The "net pay is roughly the same" framing you started with is true at the <em>gross</em> level (within 3%). After CA tax and Menlo Park COL, Meta is materially behind.</p>
+        <p style="margin-top:14px;color:var(--text);"><strong>Δ deltas vs Amazon Bellevue (4-year, net after tax + COL):</strong></p>
+        <ul style="margin-left:20px;color:var(--text);">
+            <li>Amazon SF transfer: <strong style="color:var(--red);">−$228K</strong> (CA tax + SF COL drag)</li>
+            <li>Meta Menlo Park: <strong style="color:var(--red);">−$270K</strong> (CA tax + COL drag, smaller equity grant) — and <strong style="color:var(--critical);">−$798K including $528K AMZN cliff forfeit</strong></li>
+        </ul>
+        <p style="color:var(--text);"><strong>Δ Amazon SF vs Meta Menlo Park (apples-to-apples Bay Area, 4yr net after tax + COL):</strong> Amazon SF wins by <strong style="color:var(--green);">~$42K</strong> on cash alone. Including AMZN cliff preservation: Amazon SF wins by <strong style="color:var(--green);">~$570K</strong>.</p>
+        <p style="color:var(--text);"><strong>Bottom line:</strong> If Bay Area lifestyle is the goal, the internal Amazon transfer is materially better than Meta on every dimension <em>except</em> brand prestige. You keep your AMZN cliff, your Y2 sign-on, your tenure clock, and you avoid Meta's Checkpoint stack-rank.</p>
     </div>
 
-    <h3 style="margin-top:24px;">Head-to-head, gross TC, before tax / COL</h3>
+    <h3 style="margin-top:24px;">Head-to-head, gross TC, before tax / COL (3-way)</h3>
     <div class="chart-wrap"><canvas id="grossChart"></canvas></div>
 
-    <h3 style="margin-top:24px;">Net take-home by year (after federal + state + FICA)</h3>
+    <h3 style="margin-top:24px;">Net take-home by year (after federal + state + FICA, 3-way)</h3>
     <div class="chart-wrap"><canvas id="netChart"></canvas></div>
+
+    <h3 style="margin-top:24px;">Net after-tax + COL by year (3-way)</h3>
+    <div class="chart-wrap"><canvas id="netCOLChart"></canvas></div>
 
     <p class="footnote">Federal tax: 2026 single-filer brackets, simplified. CA state: progressive to 10.3% marginal at this income (excludes 1% mental-health surcharge above $1M). FICA: SS capped at $176,100 wage base + 1.45% Medicare + 0.9% additional Medicare above $200K. Equity treated as ordinary income at vest. COL premium based on ~32% higher Menlo Park/SF cost of living vs Bellevue (rent + other essentials). Amazon refresh grants would extend the trajectory beyond Y4 — excluded for clean apples-to-apples comparison.</p>
 </div>
@@ -883,11 +958,19 @@
         <p>Time cost: 0 days extra job-searching. Ask your Meta recruiter Ruta Singh.</p>
     </div>
 
-    <div class="card">
-        <h3>Option 1 — Amazon internal transfer to Bay Area</h3>
+    <div class="card amazon-sf">
+        <h3>Option 1 — Amazon internal transfer to Bay Area <span class="badge amazon-sf">Modeled in detail</span></h3>
         <p><span class="badge green">Most aligned with what you actually want</span></p>
-        <p>Amazon has real Bay Area presence (Sunnyvale, San Francisco, East Palo Alto, Lab126, AGI, AWS AI). An L6 internal transfer keeps your tenure clock, your AMZN vest schedule (no cliff forfeiture), your Y2 sign-on, and your manager relationships — and puts you in the Bay Area. Yes, you'd start paying CA tax — but you'd avoid Meta-tier layoff risk and keep your $528K AMZN equity.</p>
-        <p>Action: post in internal mobility, talk to Bay Area science orgs (AGI, Alexa AI, AWS AI, Lab126). 4–8 week process.</p>
+        <p>Amazon has real Bay Area presence (Sunnyvale, San Francisco, East Palo Alto, Lab126, AGI, AWS AI). The "Real Offer Numbers" tab now models this in full detail.</p>
+        <p><strong>Quantified outcome (4-year cumulative, after tax + COL):</strong></p>
+        <ul style="margin-left:20px;color:var(--text);">
+            <li>Amazon Bellevue: <strong style="color:var(--amazon);">$1,064K</strong></li>
+            <li>Amazon SF transfer: <strong style="color:var(--amazon-sf);">$836K</strong> (−$228K vs Bellevue, due to CA tax + COL)</li>
+            <li>Meta Menlo Park: <strong style="color:var(--meta);">$794K</strong> (−$270K vs Bellevue, before cliff impact)</li>
+            <li>Meta Menlo Park <em>after</em> $528K cliff forfeit: <strong style="color:var(--critical);">$266K</strong> (−$798K vs Bellevue)</li>
+        </ul>
+        <p><strong>Amazon SF beats Meta MPK by ~$42K on cash alone, and by ~$570K once you factor in the AMZN cliff preservation.</strong> Same Bay Area lifestyle, lower stress, no Checkpoint stack-rank, no equity reset, no sign-on clawback risk.</p>
+        <p>Action: post in internal mobility, talk to Bay Area science orgs (AGI, Alexa AI, AWS AI, Lab126). 4–8 week process. Negotiate locality adjustment to base salary.</p>
     </div>
 
     <div class="card">
@@ -918,8 +1001,14 @@
     <h2>Final Recommendation (Updated)</h2>
 
     <div class="recommendation">
-        <div class="rec-verdict">Don't start at Meta on April 27 / May 2026. Push the start date.</div>
-        <p>The previous version of this dashboard concluded "don't take Meta." With the actual offers in hand, the conclusion sharpens: <strong>even if you ultimately want to take Meta, starting before your Amazon 1-year vest cliff (July 15, 2026) is a $200-700K mistake.</strong></p>
+        <div class="rec-verdict">Don't take Meta. If you want the Bay Area, transfer internally at Amazon — it dominates Meta on both cash and risk.</div>
+        <p>With three scenarios fully modeled, the ranking is unambiguous:</p>
+        <ol style="margin-left:24px;color:var(--text);font-size:1.05em;">
+            <li><strong style="color:var(--amazon);">Amazon Bellevue (stay):</strong> $1,064K net over 4yr — best on cash, lowest stress, highest WLB.</li>
+            <li><strong style="color:var(--amazon-sf);">Amazon SF transfer:</strong> $836K net over 4yr — −$228K vs staying (CA tax + SF COL), but +$570K vs Meta when factoring the cliff. Best "Bay Area" option.</li>
+            <li><strong style="color:var(--meta);">Meta Menlo Park:</strong> $794K net over 4yr <em>(before cliff)</em>; $266K <em>(after $528K cliff forfeit)</em>. Worst on cash, worst on risk, worst on stress.</li>
+        </ol>
+        <p style="margin-top:12px;"><strong>If your goal is Bay Area lifestyle / network: take Option 2 (Amazon SF transfer). If your goal is maximum 4-year wealth: stay in Bellevue. Meta is dominated under both objectives.</strong></p>
 
         <h3 style="margin-top:18px;">The 30-day playbook</h3>
         <ol class="timeline" style="list-style:none;">
@@ -1138,20 +1227,22 @@ function buildGrossChart() {
     const ctx = document.getElementById('grossChart');
     if (!ctx) return;
     if (grossChart) grossChart.destroy();
-    const amzData = [373.4, 386.6, 401.2, 401.2];
-    const metaData = [403.05, 373.05, 373.05, 373.05];
+    const amzData   = [373.4, 386.6, 401.2, 401.2];
+    const amzSFData = [383.4, 396.6, 411.2, 411.2];
+    const metaData  = [403.05, 373.05, 373.05, 373.05];
     grossChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4'],
             datasets: [
-                { label: 'Amazon (Bellevue) — gross TC ($K)', data: amzData, backgroundColor: 'rgba(255,153,0,0.7)', borderColor: '#ff9900', borderWidth: 2 },
-                { label: 'Meta (Menlo Park) — gross TC ($K)', data: metaData, backgroundColor: 'rgba(8,102,255,0.7)', borderColor: '#0866ff', borderWidth: 2 }
+                { label: 'Amazon Bellevue — gross TC ($K)', data: amzData, backgroundColor: 'rgba(255,153,0,0.85)', borderColor: '#ff9900', borderWidth: 2 },
+                { label: 'Amazon SF transfer — gross TC ($K)', data: amzSFData, backgroundColor: 'rgba(0,194,168,0.85)', borderColor: '#00c2a8', borderWidth: 2 },
+                { label: 'Meta Menlo Park — gross TC ($K)', data: metaData, backgroundColor: 'rgba(8,102,255,0.85)', borderColor: '#0866ff', borderWidth: 2 }
             ]
         },
         options: {
             responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { labels: { color: '#e6edf3' } }, title: { display: true, text: 'Year-by-year gross TC (assuming flat AMZN/META prices)', color: '#e6edf3' } },
+            plugins: { legend: { labels: { color: '#e6edf3' } }, title: { display: true, text: 'Year-by-year gross TC (3-way, flat stock prices)', color: '#e6edf3' } },
             scales: {
                 x: { ticks: { color: '#8b949e' }, grid: { color: '#30363d' } },
                 y: { ticks: { color: '#8b949e', callback: v => '$' + v + 'K' }, grid: { color: '#30363d' } }
@@ -1160,32 +1251,60 @@ function buildGrossChart() {
     });
 
     buildNetChart();
+    buildNetCOLChart();
 }
 
-let netChart;
+let netChart, netCOLChart;
 function buildNetChart() {
     const ctx = document.getElementById('netChart');
     if (!ctx) return;
     if (netChart) netChart.destroy();
-    // After-tax (no COL)
-    const amzNet     = [255.3, 263.5, 272.7, 272.7];
-    const metaNet    = [239.2, 223.5, 223.5, 223.5];
-    // After-tax + after-COL
-    const amzNetCOL  = [255.3, 263.5, 272.7, 272.7];
-    const metaNetCOL = [210.2, 194.5, 194.5, 194.5];
+    // After-tax (before COL)
+    const amzNet    = [255.3, 263.5, 272.7, 272.7];
+    const amzSFNet  = [228.9, 235.8, 243.4, 243.4];
+    const metaNet   = [239.2, 223.5, 223.5, 223.5];
     netChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4'],
             datasets: [
-                { label: 'Amazon — net after tax ($K)', data: amzNet, backgroundColor: 'rgba(255,153,0,0.85)', borderColor: '#ff9900', borderWidth: 2, stack: 'amz' },
-                { label: 'Meta — net after tax ($K)', data: metaNet, backgroundColor: 'rgba(8,102,255,0.85)', borderColor: '#0866ff', borderWidth: 2, stack: 'meta' },
-                { label: 'Meta — net after tax + COL ($K)', data: metaNetCOL, backgroundColor: 'rgba(8,102,255,0.4)', borderColor: '#0866ff', borderWidth: 2, borderDash: [6,4], stack: 'metaCol' }
+                { label: 'Amazon Bellevue — net after tax ($K)', data: amzNet, backgroundColor: 'rgba(255,153,0,0.85)', borderColor: '#ff9900', borderWidth: 2 },
+                { label: 'Amazon SF — net after tax ($K)', data: amzSFNet, backgroundColor: 'rgba(0,194,168,0.85)', borderColor: '#00c2a8', borderWidth: 2 },
+                { label: 'Meta Menlo Park — net after tax ($K)', data: metaNet, backgroundColor: 'rgba(8,102,255,0.85)', borderColor: '#0866ff', borderWidth: 2 }
             ]
         },
         options: {
             responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { labels: { color: '#e6edf3' } }, title: { display: true, text: 'Net take-home by year — Meta loses ~$30K/yr on CA tax + ~$29K/yr on COL', color: '#e6edf3' } },
+            plugins: { legend: { labels: { color: '#e6edf3' } }, title: { display: true, text: 'Net take-home by year (after federal + state + FICA, before COL)', color: '#e6edf3' } },
+            scales: {
+                x: { ticks: { color: '#8b949e' }, grid: { color: '#30363d' } },
+                y: { ticks: { color: '#8b949e', callback: v => '$' + v + 'K' }, grid: { color: '#30363d' } }
+            }
+        }
+    });
+}
+
+function buildNetCOLChart() {
+    const ctx = document.getElementById('netCOLChart');
+    if (!ctx) return;
+    if (netCOLChart) netCOLChart.destroy();
+    // After-tax + after-COL
+    const amzCOL    = [255.3, 263.5, 272.7, 272.7];
+    const amzSFCOL  = [199.9, 206.8, 214.4, 214.4];
+    const metaCOL   = [210.2, 194.5, 194.5, 194.5];
+    netCOLChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4'],
+            datasets: [
+                { label: 'Amazon Bellevue — net after tax + COL ($K)', data: amzCOL, backgroundColor: 'rgba(255,153,0,0.85)', borderColor: '#ff9900', borderWidth: 2 },
+                { label: 'Amazon SF — net after tax + COL ($K)', data: amzSFCOL, backgroundColor: 'rgba(0,194,168,0.85)', borderColor: '#00c2a8', borderWidth: 2 },
+                { label: 'Meta Menlo Park — net after tax + COL ($K)', data: metaCOL, backgroundColor: 'rgba(8,102,255,0.85)', borderColor: '#0866ff', borderWidth: 2 }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#e6edf3' } }, title: { display: true, text: 'Net take-home (after tax + after COL premium)', color: '#e6edf3' } },
             scales: {
                 x: { ticks: { color: '#8b949e' }, grid: { color: '#30363d' } },
                 y: { ticks: { color: '#8b949e', callback: v => '$' + v + 'K' }, grid: { color: '#30363d' } }
@@ -1227,20 +1346,23 @@ function buildTrajectoryChart() {
     function priceAtYr(start, growth, yr) { return start * Math.pow(1 + growth, yr); }
 
     const amzTC = [];
+    const amzSFTC = [];
     const metaTC = [];
     const yrs = [1,2,3,4];
     for (const y of yrs) {
-        const amzPrice = priceAtYr(AMZN_PRICE_DEFAULT, amzG, y - 0.5); // mid-year price
+        const amzPrice = priceAtYr(AMZN_PRICE_DEFAULT, amzG, y - 0.5);
         const metaPrice = priceAtYr(META_PRICE_DEFAULT, metaG, y - 0.5);
         // Amazon RSU schedule: 5/15/40/40
         const amzPct = y === 1 ? 0.05 : y === 2 ? 0.15 : 0.40;
         const amzSign = y === 1 ? 157000 : y === 2 ? 117400 : 0;
-        const amzYr = 190000 + amzSign + (AMZN_SHARES * amzPct) * amzPrice;
-        // Meta RSU: META price ratio to original determines value of vest
+        const amzYr   = 190000 + amzSign + (AMZN_SHARES * amzPct) * amzPrice;
+        const amzSFYr = 200000 + amzSign + (AMZN_SHARES * amzPct) * amzPrice;
+        // Meta
         const metaRSURatio = metaPrice / META_PRICE_DEFAULT;
         const metaSign = y === 1 ? 30000 : 0;
         const metaYr = 232000 + 34800 + metaSign + (META_RSU_INITIAL * 0.25) * metaRSURatio;
         amzTC.push(amzYr / 1000);
+        amzSFTC.push(amzSFYr / 1000);
         metaTC.push(metaYr / 1000);
     }
 
@@ -1250,13 +1372,14 @@ function buildTrajectoryChart() {
         data: {
             labels: ['Yr 1', 'Yr 2', 'Yr 3', 'Yr 4'],
             datasets: [
-                { label: 'Amazon — gross TC ($K)', data: amzTC, borderColor: '#ff9900', backgroundColor: 'rgba(255,153,0,0.15)', tension: 0.3, fill: true, pointRadius: 5 },
-                { label: 'Meta — gross TC ($K)', data: metaTC, borderColor: '#0866ff', backgroundColor: 'rgba(8,102,255,0.15)', tension: 0.3, fill: true, pointRadius: 5 }
+                { label: 'Amazon Bellevue — gross TC ($K)', data: amzTC, borderColor: '#ff9900', backgroundColor: 'rgba(255,153,0,0.15)', tension: 0.3, fill: false, pointRadius: 5 },
+                { label: 'Amazon SF transfer — gross TC ($K)', data: amzSFTC, borderColor: '#00c2a8', backgroundColor: 'rgba(0,194,168,0.15)', tension: 0.3, fill: false, pointRadius: 5 },
+                { label: 'Meta Menlo Park — gross TC ($K)', data: metaTC, borderColor: '#0866ff', backgroundColor: 'rgba(8,102,255,0.15)', tension: 0.3, fill: false, pointRadius: 5 }
             ]
         },
         options: {
             responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { labels: { color: '#e6edf3' } }, title: { display: true, text: 'TC trajectory with stock growth assumptions', color: '#e6edf3' } },
+            plugins: { legend: { labels: { color: '#e6edf3' } }, title: { display: true, text: 'TC trajectory with stock growth assumptions (3-way)', color: '#e6edf3' } },
             scales: {
                 x: { ticks: { color: '#8b949e' }, grid: { color: '#30363d' } },
                 y: { ticks: { color: '#8b949e', callback: v => '$' + v + 'K' }, grid: { color: '#30363d' } }
@@ -1266,14 +1389,17 @@ function buildTrajectoryChart() {
 
     // Narrative
     const amzCum = amzTC.reduce((a,b)=>a+b, 0);
+    const amzSFCum = amzSFTC.reduce((a,b)=>a+b, 0);
     const metaCum = metaTC.reduce((a,b)=>a+b, 0);
-    const diff = amzCum - metaCum;
     const narr = document.getElementById('trajectoryNarrative');
     if (narr) {
-        narr.innerHTML = `<p>4-year cumulative gross TC: <strong style="color:var(--amazon)">Amazon $${amzCum.toFixed(0)}K</strong> vs <strong style="color:var(--meta)">Meta $${metaCum.toFixed(0)}K</strong> — ` +
-            (diff > 0 ? `Amazon ahead by $${diff.toFixed(0)}K.` : `Meta ahead by $${(-diff).toFixed(0)}K.`) +
-            ` This excludes the $528K AMZN cliff forfeiture if you leave Amazon now (which would shift the comparison further toward Amazon by ~$528K).</p>` +
-            `<p style="margin-top:10px;">At the trailing 12-month historical growth (AMZN +33%, META +5%), Amazon's lead grows to <strong>$300K+ over 4 years</strong>.</p>`;
+        narr.innerHTML = `<p>4-year cumulative gross TC: ` +
+            `<strong style="color:var(--amazon)">Amazon Bellevue $${amzCum.toFixed(0)}K</strong>, ` +
+            `<strong style="color:var(--amazon-sf)">Amazon SF $${amzSFCum.toFixed(0)}K</strong>, ` +
+            `<strong style="color:var(--meta)">Meta MPK $${metaCum.toFixed(0)}K</strong>.</p>` +
+            `<p style="margin-top:10px;">Amazon SF leads gross by $${(amzSFCum - amzCum).toFixed(0)}K (locality bump) and $${(amzSFCum - metaCum).toFixed(0)}K vs Meta. After CA tax + SF COL, Amazon Bellevue still wins net. <strong>Amazon SF is the strongest "Bay Area" option.</strong></p>` +
+            `<p style="margin-top:10px;">At trailing 12-month growth (AMZN +33%, META +5%), Amazon's lead widens — try setting AMZN to +33% and META to +5% to see.</p>` +
+            `<p style="margin-top:10px;color:var(--critical);">Excludes the $528K AMZN cliff forfeit (Meta path only).</p>`;
     }
 }
 
