@@ -13,6 +13,12 @@
 
 ## 📂 What's in This Repository
 
+- **`career-decision.html`** — 🆕 Interactive Amazon (Bellevue) vs Meta WhatsApp Business (SF) decision dashboard
+  - 💰 Live net-in-hand calculator (federal + CA tax + FICA + COL)
+  - 😰 Stress / WLB radar comparison
+  - 📈 1-year & 3-year probability-weighted TC trajectory
+  - 🎯 Alternatives (internal transfer, parallel interviews, negotiation)
+  - 📋 90-day playbook + recommendation
 - **`index.html`** — Interactive strategy dashboard (open in browser)
   - 🏢 12 target incubators ranked by strategic fit across 3 tiers
   - 💡 5 venture ideas with TAM, moat analysis, and YC fit scores
